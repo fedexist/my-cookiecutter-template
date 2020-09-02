@@ -1,0 +1,35 @@
+{
+  "full_name": "Federico D'Ambrosio",
+  "email": "federico.dambrosio@generali.com",
+  "project_name": "My Freedaa Project",
+  "project_slug": "{{ cookiecutter.project_name.lower().replace(' ', '_').replace('-', '_') }}",
+  "freeda_version": "0.0.1",
+  "project_short_description": "freedaa-template contains all the boilerplate you need to create a FrEEDAA-enabled project ready to be deployed in production.",
+  "version": "0.1.0",
+  "use_pytest": "y",
+  "command_line_interface": [
+    "Click",
+    "Argparse",
+    "No command-line interface"
+  ],
+  "gcf_name": "freedaa_model_serving",
+  "gcf_python_runtime": [
+    "python38",
+    "python37"
+  ],
+  "gcf_trigger": [
+    "http",
+    "topic",
+    "bucket"
+  ],
+  "gcf_topic": "",
+  "gcf_bucket": "",
+  "gcf_memory": [
+    "128MB", "256MB", "512MB", "1024MB", "2048MB"
+  ],
+  "gcp_project_id": "poc-generali-aal",
+  "gcf_service_account": "",
+  "project_bucket": "",
+  "pipeline_path": "pipelines/latest/trained_pipeline.pkl",
+  "create_author_file": "y"
+}

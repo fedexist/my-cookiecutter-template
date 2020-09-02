@@ -1,0 +1,181 @@
+pipeline {
+    agent any
+
+    environment {
+        PROJECT_ID = '{{cookiecutter.gcp_project_id}}'
+        LOCATION = 'europe-west1-b'
+        CREDENTIALS_ID = 'jenkins-service-account'
+        GCR_URL = "eu.gcr.io/${PROJECT_ID}"
+        DOCKER_IMAGE_LATEST = "latest"
+        COMMIT_HASH = sh(script: 'git rev-parse --short HEAD', returnStdout: true).trim()
+        BASE_IMAGE = "{{cookiecutter.project_slug}}"
+        BASE_IMAGE_TAG = "${env.GCR_URL}/${env.BASE_IMAGE}"
+        {%- if cookiecutter.gcf_python_runtime == 'python38' -%}
+        PYTHON_INTERPRETER = 'python3.8'
+        {%- elif cookiecutter.gcf_python_runtime == 'python37' -%}
+        PYTHON_INTERPRETER = 'python3.7'
+        {% endif %}
+
+
+    }
+
+    stages {
+
+        stage('Clone sources') {
+            steps {
+                slackSend (color: '#FFFF00', message: "STARTED: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})")
+                checkout scm
+            }
+        }
+
+        stage('Run tests') {
+            environment {
+                ENV='TEST'
+            }
+            steps {
+                sh '''
+                ${env.PYTHON_INTERPRETER} -m venv venv
+                . venv/bin/activate
+                ${env.PYTHON_INTERPRETER} -m pip install pip tox --upgrade
+                ${env.PYTHON_INTERPRETER} -m tox
+                '''
+            }
+        }
+
+
+        stage('SQ analysis') {
+             environment {
+                scannerHome = tool 'sonar_scanner'
+            }
+            steps {
+                withSonarQubeEnv(credentialsId: 'sonarqube_token', installationName: 'sonarqube_aa') {
+                    sh '${scannerHome}/bin/sonar-scanner'
+                }
+            }
+        }
+
+        stage("Build Docker images") {
+            steps {
+                script {
+                    docker_image_base = docker.build("${BASE_IMAGE_TAG}:${COMMIT_HASH}", "-f Dockerfile .")
+                }
+            }
+        }
+
+        stage("Docker image Scanning") {
+            steps {
+                script {
+                    //We can accept LOW/MEDIUM/HIGH Vulnerabilities
+                    sh "trivy --exit-code 0 --severity LOW,MEDIUM,HIGH \"${env.BASE_IMAGE_TAG}:${COMMIT_HASH}\""
+
+                    //We cannot accept CRITICAL Vulnerabilities
+                    //Yes, we can if there's no fix available
+                    // sh "trivy --exit-code 1 --severity CRITICAL \"${env.BASE_IMAGE_TAG}:${COMMIT_HASH}\""
+                    // sh "trivy --exit-code 1 --severity CRITICAL \"${env.SERVER_IMAGE_TAG}:${COMMIT_HASH}\""
+                    // sh "trivy --exit-code 1 --severity CRITICAL \"${env.LISTENER_IMAGE_TAG}:${COMMIT_HASH}\""
+
+                }
+            }
+        }
+
+        stage("Push commit images") {
+            steps {
+                script {
+
+                    withDockerRegistry(credentialsId: 'gcr:jenkins-service-account', url: "https://${env.GCR_URL}") {
+                        docker_image_base.push()
+                    }
+                }
+            }
+        }
+
+
+        stage("Push latest images") {
+
+            steps {
+                script {
+
+                    withDockerRegistry(credentialsId: 'gcr:jenkins-service-account', url: "https://${env.GCR_URL}") {
+                        docker_image_base.push("latest")
+                    }
+                }
+            }
+        }
+
+        stage("Push release images") {
+
+            when {
+                allOf {
+                    expression {
+                        return env.GIT_BRANCH == "origin/master"
+                    }
+                    tag pattern: "\\d\\.\\d\\.\\d", comparator: "REGEXP";
+                }
+            }
+
+            environment {
+                APP_VERSION = sh(script:'git describe --tags --abbrev=0', , returnStdout: true).trim()
+            }
+
+            steps {
+                script {
+
+                    withDockerRegistry(credentialsId: 'gcr:jenkins-service-account', url: "https://${env.GCR_URL}") {
+                        docker_image_base.push(APP_VERSION)
+                    }
+                }
+            }
+        }
+
+        stage("Deploy GCF") {
+
+            when {
+                allOf {
+                    expression {
+                        return env.GIT_BRANCH == "origin/master"
+                    }
+                    tag pattern: "\\d\\.\\d\\.\\d", comparator: "REGEXP";
+                }
+            }
+
+            steps{
+                // Here you should copy all files that are needed by the Google Cloud Function
+                sh("cp -r {{cookiecutter.project_slug}}/* gcf/")
+                sh("cp requirements_dev.txt gcf/requirements.txt")
+                sh("gsutil cp gs://{{cookiecutter.project_bucket}}/{{cookiecutter.pipeline_path}} gcf/static_files/")
+                // A Google Cloud Function named as the project will be deployed
+                sh("gcloud functions deploy {{ cookiecutter.project_slug }} \
+                        --runtime {{cookiecutter.gcf_python_runtime}} \
+                        --region europe-west1 \
+                        {%- if cookiecutter.gcf_trigger == "http" -%}
+                        --trigger-http \
+                        {%- elif cookiecutter.gcf_trigger == "bucket" -%}
+                        --trigger-bucket={{cookiecutter.gcf_bucket}} \
+                        {%- elif cookiecutter.gcf_trigger == "topic" -%}
+                        --trigger-topic={{cookiecutter.gcf_topic}} \
+                        {% endif %}
+                        --service-account={{cookiecutter.gcf_service_account}}
+                        --memory={{cookiecutter.gcf_memory}} \
+                        --timeout=540s \
+                        --entry-point={{ cookiecutter.gcf_name }} \
+                        --source=gcf/")
+            }
+        }
+    }
+
+    post {
+        always {
+            cleanWs deleteDirs: true, disableDeferredWipeout: true, patterns: [[pattern: '', type: 'INCLUDE']]
+        }
+        success {
+            slackSend (color: '#00FF00', message: "SUCCESSFUL: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})")
+            sh """
+                docker images -a | grep ${env.BASE_IMAGE} | awk \'{print \$3}\' | xargs docker rmi -f
+            """
+        }
+        failure {
+            slackSend (color: '#FF0000', message: "FAILURE: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})")
+
+        }
+    }
+}
