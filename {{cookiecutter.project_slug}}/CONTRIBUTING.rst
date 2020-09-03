@@ -79,7 +79,7 @@ Ready to contribute? Here's how to set up `{{ cookiecutter.project_slug }}` for 
 5. When you're done making changes, check that your changes pass flake8 and the
    tests, including testing other Python versions with tox::
 
-    $ flake8 {{ cookiecutter.project_slug }} tests
+    $ flake8 {{ cookiecutter.package_name }} tests
     $ python setup.py test or pytest
     $ tox
 
@@ -111,9 +111,9 @@ Tips
 To run a subset of tests::
 
 {% if cookiecutter.use_pytest == 'y' -%}
-    $ pytest tests.test_{{ cookiecutter.project_slug }}
+    $ pytest tests.test_{{ cookiecutter.package_name }}
 {% else %}
-    $ python -m unittest tests.test_{{ cookiecutter.project_slug }}
+    $ python -m unittest tests.test_{{ cookiecutter.package_name }}
 {%- endif %}
 
 Deploying

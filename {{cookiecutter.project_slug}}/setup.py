@@ -10,7 +10,8 @@ with open('README.rst') as readme_file:
 with open('HISTORY.rst') as history_file:
     history = history_file.read()
 
-requirements = [{%- if cookiecutter.command_line_interface|lower == 'click' %}'Click>=7.0',{%- endif %} ]
+requirements = [{%- if cookiecutter.command_line_interface|lower == 'click' %}'Click>=7.0',{%- endif %}
+                {%- if cookiecutter.use_freedaa == 'y' %}'freedaa=={{ cookiecutter.freeda_version }}',{%- endif %}]
 
 setup_requirements = [{%- if cookiecutter.use_pytest == 'y' %}'pytest-runner',{%- endif %} ]
 
@@ -35,16 +36,16 @@ setup(
     {%- if 'no' not in cookiecutter.command_line_interface|lower %}
     entry_points={
         'console_scripts': [
-            '{{ cookiecutter.project_slug }}={{ cookiecutter.project_slug }}.cli:main',
+            '{{ cookiecutter.package_name }}={{ cookiecutter.package_name }}.cli:main',
         ],
     },
     {%- endif %}
     install_requires=requirements,
     long_description=readme + '\n\n' + history,
     include_package_data=True,
-    keywords='{{ cookiecutter.project_slug }}',
-    name='{{ cookiecutter.project_slug }}',
-    packages=find_packages(include=['{{ cookiecutter.project_slug }}', '{{ cookiecutter.project_slug }}.*']),
+    keywords='{{ cookiecutter.package_name }}',
+    name='{{ cookiecutter.package_name }}',
+    packages=find_packages(include=['{{ cookiecutter.package_name }}', '{{ cookiecutter.package_name }}.*']),
     setup_requires=setup_requirements,
     test_suite='tests',
     tests_require=test_requirements,

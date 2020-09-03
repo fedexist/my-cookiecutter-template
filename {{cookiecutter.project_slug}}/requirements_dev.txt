@@ -12,4 +12,5 @@ Click==7.1.2{% endif %}
 {% if cookiecutter.use_pytest == 'y' -%}
 pytest==6.0.1
 pytest-runner==5.2{% endif %}
-freedaa=={{ cookiecutter.freeda_version }}
+{% if cookiecutter.use_freedaa == 'y' %}
+freedaa=={{ cookiecutter.freeda_version }}{% endif %}
