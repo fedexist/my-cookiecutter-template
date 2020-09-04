@@ -9,6 +9,7 @@ PROJECT_DIRECTORY = os.path.realpath(os.path.curdir)
 def remove_file(filepath):
     os.remove(os.path.join(PROJECT_DIRECTORY, filepath))
 
+
 def remove_folder(folder_path):
     shutil.rmtree(folder_path, ignore_errors=True)
 
@@ -23,11 +24,14 @@ if __name__ == '__main__':
         cli_file = os.path.join('{{ cookiecutter.package_name }}', 'cli.py')
         remove_file(cli_file)
 
-    if '{{ cookiecutter.use_freedaa }}' == 'n':
+    if '{{ cookiecutter.use_freedaa }}' != 'y':
         remove_folder('gcf')
 
-    if '{{ cookiecutter.use_sql }}' == 'n':
+    if '{{ cookiecutter.use_sql }}' != 'y':
         remove_folder('sql')
+
+    if '{{ cookiecutter.use_pycharm }}' != 'y':
+        remove_folder('.idea')
 
     if '{{cookiecutter.init_git}}' == 'y':
         os.system('git init')

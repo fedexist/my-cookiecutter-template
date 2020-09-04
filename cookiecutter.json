@@ -11,6 +11,7 @@
   "use_pytest": ["y", "n"],
   "init_git": ["y", "n"],
   "use_sql": ["y", "n"],
+  "use_pycharm": ["y", "n"],
   "command_line_interface": [
     "Click",
     "Argparse",
