@@ -260,4 +260,13 @@ if "%1" == "pseudoxml" (
 	goto end
 )
 
+if "%1" == "confluence" (
+	%SPHINXBUILD% -b confluence %ALLSPHINXOPTS% %BUILDDIR%/confluence -E -a
+	if errorlevel 1 exit /b 1
+	echo.
+	echo.Build finished. The documentation files have been published on the configured Confluence instance.
+	goto end
+)
+
+
 :end

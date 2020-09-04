@@ -13,7 +13,7 @@ Types of Contributions
 Report Bugs
 ~~~~~~~~~~~
 
-Report bugs at https://gitlab.advancedanalytics.generali.com/aa-generali-italia/freedaa-template/issues
+Report bugs at https://gitlab.advancedanalytics.generali.com/aa-generali-italia/aa-pypackage/issues
 
 If you are reporting a bug, please include:
 
@@ -36,7 +36,7 @@ and "help wanted" is open to whoever wants to implement it.
 Write Documentation
 ~~~~~~~~~~~~~~~~~~~
 
-freedaa-template could always use more documentation, whether as part of
+aa-pypackage could always use more documentation, whether as part of
 the official docs, in docstrings, or even on the web in blog posts, articles,
 and such.
 
@@ -44,7 +44,7 @@ Submit Feedback
 ~~~~~~~~~~~~~~~
 
 The best way to send feedback is to file an issue at
-https://gitlab.advancedanalytics.generali.com/aa-generali-italia/freedaa-template/issues
+https://gitlab.advancedanalytics.generali.com/aa-generali-italia/aa-pypackage/issues
 or shoot me a message on Slack.
 
 If you are proposing a new feature:
@@ -61,7 +61,7 @@ Ready to contribute? Here's how to set up `cookiecutter-pypackage` for local
 development. Please note this documentation assumes you already have
 `virtualenv` and `Git` installed and ready to go.
 
-1. Fork the `freedaa-template` repo on Gitlab.
+1. Fork the `aa-pypackage` repo on Gitlab.
 
 ::
 
@@ -70,7 +70,7 @@ development. Please note this documentation assumes you already have
    .. code-block:: bash
 
     $ cd path_for_the_repo
-    $ git clone git@gitlab.advancedanalytics.generali.com:aa-generali-italia/freedaa-template.git
+    $ git clone git@gitlab.advancedanalytics.generali.com:aa-generali-italia/aa-pypackage.git
 
 ::
 
@@ -80,14 +80,14 @@ development. Please note this documentation assumes you already have
 
    .. code-block:: bash
 
-        $ virtualenv freedaa-template-env
-        $ source freedaa-template-env/bin/activate
+        $ virtualenv aa-pypackage-env
+        $ source aa-pypackage-env/bin/activate
 
    This should change the shell to look something like:
 
    .. code-block:: bash
 
-        (freedaa-template-env) $
+        (aa-pypackage-env) $
 
 ::
 

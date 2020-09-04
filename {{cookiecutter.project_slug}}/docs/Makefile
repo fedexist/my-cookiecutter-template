@@ -18,3 +18,8 @@ help:
 # "make mode" option.  $(O) is meant as a shortcut for $(SPHINXOPTS).
 %: Makefile
 	@$(SPHINXBUILD) -M $@ "$(SOURCEDIR)" "$(BUILDDIR)" $(SPHINXOPTS) $(O)
+
+confluence:
+	$(SPHINXBUILD) -b confluence $(ALLSPHINXOPTS) $(BUILDDIR)/confluence -E -a
+	@echo
+	@echo "Build finished. The documentation files have been published on the configured Confluence instance."

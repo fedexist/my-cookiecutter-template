@@ -163,6 +163,16 @@ pipeline {
             }
         }
         {% endif %}
+
+        stage('Generate and publish doc') {
+
+            sh '''
+            cd docs
+            make confluence
+            '''
+
+        }
+
     }
 
     post {

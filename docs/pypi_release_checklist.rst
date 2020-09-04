@@ -8,7 +8,25 @@ Before Your First Release
 
     .. code-block:: bash
 
-        python setup.py register
+        # Make sure your .pypirc is updated
+        cat ~/.pypirc
+        [distutils]
+        index-servers =
+            aapi-staging
+            aapi-stable
+
+        [aapi-staging]
+        repository: pypi.advancedanalytics.generali.com/
+        username: <username>
+        password: <password>
+
+        [aapi-stable]
+        repository: pypi.advancedanalytics.generali.com/
+        username: <username>
+        password: <password>
+
+        python setup.py register -r aapi-staging
+        python setup.py register -r aapi-stable
 
 #. Visit PyPI to make sure it registered.
 
@@ -65,7 +83,7 @@ For Every Release
             pip install readme_renderer
             python setup.py check -r -s
 
-#. Edit the release on GitHub (e.g. https://github.com/audreyr/cookiecutter/releases). Paste the release notes into the release's release page, and come up with a title for the release.
+#. Edit the release on Gitlab (e.g. https://gitlab.advancedanalytics.generali.com/aa-generali-italia/aa-pypackage/tags). Paste the release notes into the release's release page, and come up with a title for the release.
 
 About This Checklist
 --------------------

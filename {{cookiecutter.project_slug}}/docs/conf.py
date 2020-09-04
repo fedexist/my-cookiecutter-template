@@ -31,7 +31,14 @@ import {{ cookiecutter.package_name }}
 
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom ones.
-extensions = ['sphinx.ext.autodoc', 'sphinx.ext.viewcode']
+extensions = [
+    'sphinx.ext.autodoc',
+    'sphinx.ext.doctest',
+    'sphinx.ext.todo',
+    'sphinx.ext.coverage',
+    'sphinx.ext.viewcode',
+    'sphinxcontrib.confluencebuilder'
+    ]
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
@@ -127,9 +134,9 @@ latex_elements = {
 # (source start file, target name, title, author, documentclass
 # [howto, manual, or own class]).
 latex_documents = [
-    (master_doc, '{{ cookiecutter.project_slug }}.tex',
-     '{{ cookiecutter.project_name }} Documentation',
-     '{{ cookiecutter.full_name.replace("'", "\\'") }}', 'manual'),
+    (master_doc, "{{ cookiecutter.project_slug }}.tex",
+     "{{ cookiecutter.project_name }} Documentation",
+     "{{ cookiecutter.full_name }}", "manual"),
 ]
 
 
@@ -158,5 +165,12 @@ texinfo_documents = [
      'Miscellaneous'),
 ]
 
+# Confluence publish
+confluence_publish = True
+confluence_space_name = 'DE'
+confluence_parent_page = '{{cookiecutter.confluence_parent_page}}'
+confluence_server_url = 'https://aa-generali-italia.atlassian.net/wiki/'
+confluence_server_user = '{{cookiecutter.email}}'
+confluence_server_pass = os.getenv('CONFLUENCE_TOKEN')
 
 

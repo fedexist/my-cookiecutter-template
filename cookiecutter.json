@@ -1,12 +1,16 @@
 {
   "full_name": "Federico D'Ambrosio",
   "email": "federico.dambrosio@generali.com",
-  "project_name": "My Freedaa Project",
+  "project_name": "My AA Project",
   "project_slug": "{{ cookiecutter.project_name.lower().replace(' ', '_').replace('_', '-') }}",
   "package_name": "{{ cookiecutter.project_name.lower().replace(' ', '_').replace('-', '_') }}",
-  "project_short_description": "freedaa-template contains all the boilerplate you need to create a FrEEDAA-enabled project ready to be deployed in production.",
+  "project_short_description": "aa-pypackage contains all the boilerplate you need to create a standard Python project ready to be deployed in production.",
   "version": "0.1.0",
+  "confluence_parent_page": "AA Software Documentation",
+  "gcp_project_id": "poc-generali-aal",
   "use_pytest": ["y", "n"],
+  "init_git": ["y", "n"],
+  "use_sql": ["y", "n"],
   "command_line_interface": [
     "Click",
     "Argparse",
@@ -29,7 +33,6 @@
   "gcf_memory": [
     "128MB", "256MB", "512MB", "1024MB", "2048MB"
   ],
-  "gcp_project_id": "poc-generali-aal",
   "gcf_service_account": "gi-it-aa-{{cookiecutter.project_slug}}@{{cookiecutter.gcp_project_id}}.iam.gserviceaccount.com",
   "project_bucket": "{{cookiecutter.project_slug}}",
   "pipeline_path": "pipelines/latest/trained_pipeline.pkl",

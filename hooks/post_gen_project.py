@@ -25,3 +25,11 @@ if __name__ == '__main__':
 
     if '{{ cookiecutter.use_freedaa }}' == 'n':
         remove_folder('gcf')
+
+    if '{{ cookiecutter.use_sql }}' == 'n':
+        remove_folder('sql')
+
+    if '{{cookiecutter.init_git}}' == 'y':
+        os.system('git init')
+        os.system('git add .')
+        os.system('git commit -am "Initial commit"')

@@ -2,13 +2,13 @@
 
 from distutils.core import setup
 setup(
-    name='freedaa-template',
+    name='aa-pypackage',
     packages=[],
     version='0.1.0',
-    description='Cookiecutter template for a FrEEdAA-enabled Python package',
+    description='Cookiecutter template for a standard Python package, with optional FrEEdAA enabled.',
     author='Federico D\'Ambrosio',
     author_email='federico.dambrosio@generali.com',
-    url='https://gitlab.advancedanalytics.generali.com/aa-generali-italia/freedaa-template',
+    url='https://gitlab.advancedanalytics.generali.com/aa-generali-italia/aa-pypackage',
     keywords=['cookiecutter', 'template', 'package', ],
     python_requires='>=3.5',
     classifiers=[

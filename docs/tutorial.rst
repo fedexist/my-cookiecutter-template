@@ -4,13 +4,12 @@ Tutorial
 .. note:: Did you find any of these instructions confusing? `Edit this file`_
           and submit a pull request with your improvements!
 
-.. _`Edit this file`: https://github.com/audreyr/cookiecutter-pypackage/blob/master/docs/tutorial.rst
+.. _`Edit this file`: https://gitlab.advancedanalytics.generali.com/aa-generali-italia/aa-pypackage/blob/master/docs/tutorial.rst
 
-To start with, you will need a `GitHub account`_ and an account on `PyPI`_. Create these before you get started on this tutorial. If you are new to Git and GitHub, you should probably spend a few minutes on some of the tutorials at the top of the page at `GitHub Help`_.
+To start with, you will need a `Gitlab account`_. Create these before you get started on this tutorial. If you are new to Git and Gitlab, you should probably spend a few minutes on some of the tutorials at the top of the page at `Gitlab Help`_.
 
-.. _`GitHub account`: https://github.com/
-.. _`PyPI`: https://pypi.python.org/pypi
-.. _`GitHub Help`: https://help.github.com/
+.. _`Gitlab account`: https://gitlab.advancedanalytics.generali.com
+.. _`Gitlab Help`: https://gitlab.advancedanalytics.generali.com/help
 
 
 Step 1: Install Cookiecutter
@@ -53,7 +52,7 @@ Use cookiecutter, pointing it at the cookiecutter-pypackage repo:
 
 .. code-block:: bash
 
-    cookiecutter https://github.com/audreyr/cookiecutter-pypackage.git
+    cookiecutter https://gitlab.advancedanalytics.generali.com/aa-generali-italia/aa-pypackage.git
 
 You'll be asked to enter a bunch of values to set the package up.
 If you don't know what to enter, stick with the defaults.
@@ -126,7 +125,7 @@ See :ref:`travis-pypi-setup` for more information.
 
 
 Step 6: Set Up Read the Docs
---------------------------
+----------------------------
 
 `Read the Docs`_ hosts documentation for the open source community. Think of it as Continuous Documentation.
 

@@ -3,7 +3,7 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to cookiecutter-pypackage's documentation!
+Welcome to aa-pypackage's documentation!
 ==================================================
 
 Getting Started
@@ -30,13 +30,5 @@ Advanced Features
 .. toctree::
    :maxdepth: 2
 
-   travis_pypi_setup
    console_script_setup
-
-
-Indices and tables
-==================
-
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
+   troubleshooting

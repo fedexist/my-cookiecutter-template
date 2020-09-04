@@ -5,13 +5,6 @@ pipeline {
         PROJECT_ID = 'poc-generali-aal'
         LOCATION = 'europe-west1-b'
         CREDENTIALS_ID = 'jenkins-service-account'
-        GCR_URL = "eu.gcr.io/${PROJECT_ID}"
-        DOCKER_IMAGE_LATEST = "latest"
-        COMMIT_HASH = sh(script: 'git rev-parse --short HEAD', returnStdout: true).trim()
-        BASE_IMAGE = "gtel-fraud-assuntiva"
-
-        BASE_IMAGE_TAG = "${env.GCR_URL}/${env.BASE_IMAGE}"
-
     }
 
     stages {
@@ -34,6 +27,17 @@ pipeline {
                 python3.8 -m pip install pip tox --upgrade
                 python3.8 -m tox
                 '''
+            }
+        }
+
+        stage('Generate and publish doc') {
+            steps {
+                withCredentials([string(credentialsId: 'confluence-token', variable: 'CONFLUENCE_TOKEN')])
+                    sh '''
+                    cd docs
+                    make confluence
+                    '''
+                }
             }
         }
 

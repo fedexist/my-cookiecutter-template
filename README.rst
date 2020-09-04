@@ -1,10 +1,10 @@
-======================
-FrEEdAA Template
-======================
+=================================
+Advanced Analytics Python Package
+=================================
 
-Cookiecutter_ template for a FrEEdAA-enabled Python package.
+Cookiecutter_ template for a standard Python package, with optional FrEEdAA enabled.
 
-* Gitlab repo: https://gitlab.advancedanalytics.generali.com/aa-generali-italia/freedaa-template
+* Gitlab repo: https://gitlab.advancedanalytics.generali.com/aa-generali-italia/aa-pypackage
 * Original GitHub repo: https://github.com/audreyr/cookiecutter-pypackage/
 * Documentation: https://cookiecutter-pypackage.readthedocs.io/
 
@@ -33,7 +33,7 @@ Cookiecutter 1.4.0 or higher)::
 
 Generate a Python package project::
 
-    cookiecutter https://gitlab.advancedanalytics.generali.com/aa-generali-italia/freedaa-template
+    cookiecutter https://gitlab.advancedanalytics.generali.com/aa-generali-italia/aa-pypackage
 
 Then:
 

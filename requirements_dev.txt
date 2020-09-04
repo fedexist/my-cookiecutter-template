@@ -4,3 +4,4 @@ cookiecutter>=1.7.2
 pytest-cookies==0.5.1
 alabaster==0.7.12
 watchdog==0.10.3
+sphinxcontrib-confluencebuilder>=1.2.0
