@@ -3,8 +3,6 @@ pipeline {
 
     environment {
         PROJECT_ID = '{{cookiecutter.gcp_project_id}}'
-        LOCATION = 'europe-west1-b'
-        CREDENTIALS_ID = 'jenkins-service-account'
         GCR_URL = "eu.gcr.io/${PROJECT_ID}"
         DOCKER_IMAGE_LATEST = "latest"
         COMMIT_HASH = sh(script: 'git rev-parse --short HEAD', returnStdout: true).trim()
@@ -16,7 +14,10 @@ pipeline {
         {%- elif cookiecutter.gcf_python_runtime == 'python37' -%}
         PYTHON_INTERPRETER = 'python3.7'
         {% endif %}
-
+        RELEASE_TAG = sh(script:'git describe --tags --abbrev=0', , returnStdout: true).trim()
+        PYPI_REPO_STAGING = "http://pypi.advancedanalytics.generali.com/ge-it-aa/staging/"
+        PYPI_REPO_STABLE = "http://pypi.advancedanalytics.generali.com/ge-it-aa/stable/"
+        CONFLUENCE_TOKEN = credentials('confluence-token')
     }
 
     stages {
@@ -113,15 +114,11 @@ pipeline {
                 }
             }
 
-            environment {
-                APP_VERSION = sh(script:'git describe --tags --abbrev=0', , returnStdout: true).trim()
-            }
-
             steps {
                 script {
 
                     withDockerRegistry(credentialsId: 'gcr:jenkins-service-account', url: "https://${env.GCR_URL}") {
-                        docker_image_base.push(APP_VERSION)
+                        docker_image_base.push(RELEASE_TAG)
                     }
                 }
             }
@@ -164,12 +161,50 @@ pipeline {
         }
         {% endif %}
 
-        stage('Generate and publish doc') {
+        /*
+        stage('Staging on PyPi') {
 
             sh '''
-            cd docs
-            make confluence
+            make staging
             '''
+
+        }
+
+        stage('Release on PyPi') {
+
+            when {
+                allOf {
+                    expression {
+                        return env.GIT_BRANCH == "origin/master"
+                    }
+                    tag pattern: "\\d\\.\\d\\.\\d", comparator: "REGEXP";
+                }
+            }
+
+
+            sh '''
+            make release
+            '''
+
+        }*/
+
+        stage('Generate and publish doc') {
+
+            when {
+                changeset "docs/**";
+            }
+            steps {
+                withCredentials([usernamePassword(credentialsId: 'pypi-credentials', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
+                    sh '''
+                    cd docs
+                    make confluence
+                    make html
+                    zip -r {{cookiecutter.package_name}}-$RELEASE_TAG.doc.zip docs/_build/html
+                    devpi login ${USERNAME} --password=${PASSWORD}
+                    devpi upload --index ${PYPI_REPO_STAGING} --index ${PYPI_REPO_STABLE} {{cookiecutter.package_name}}-$RELEASE_TAG.doc.zip
+                    '''
+                }
+            }
 
         }
 
