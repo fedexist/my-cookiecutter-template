@@ -34,6 +34,18 @@ if __name__ == '__main__':
         remove_folder('.idea')
 
     if '{{cookiecutter.init_git}}' == 'y':
+        print("Now committing to git...")
         os.system('git init')
         os.system('git add .')
         os.system('git commit -am "Initial commit"')
+
+    if '{{ cookiecutter.init_venv }}' == 'y':
+        print("Now initializing Python virtual environment...")
+        os.system('{{cookiecutter.python_version}} -m venv venv')
+        os.system('source venv/bin/activate && '
+                  'pip install --upgrade pip setuptools ipykernel && '
+                  'python -m ipykernel install --name=venv')
+
+        print("Now installing development dependencies...")
+        os.system('source venv/bin/activate && '
+                  'pip install -r requirements_dev.txt')

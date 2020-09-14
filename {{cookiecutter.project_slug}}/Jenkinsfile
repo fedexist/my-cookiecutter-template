@@ -9,11 +9,7 @@ pipeline {
         BASE_IMAGE = "{{cookiecutter.project_slug}}"
         BASE_IMAGE_NAME = "${env.GCR_URL}/${env.BASE_IMAGE}"
         DOCKER_IMAGE_TAG = sh(script: "echo ${GIT_BRANCH} | sed -r 's/[_/.?]+/-/g' | awk '{print tolower(\$0)}' | xargs -I@ echo @-${env.COMMIT_HASH}-${env.BUILD_NUMBER}", returnStdout: true).trim()
-        {%- if cookiecutter.gcf_python_runtime == 'python38' -%}
-        PYTHON_INTERPRETER = 'python3.8'
-        {%- elif cookiecutter.gcf_python_runtime == 'python37' -%}
-        PYTHON_INTERPRETER = 'python3.7'
-        {% endif %}
+        PYTHON_INTERPRETER = '{{ cookiecutter.python_version }}'
         RELEASE_TAG = sh(script:'git describe --tags --abbrev=0', , returnStdout: true).trim()
         PYPI_REPO_STAGING = "http://pypi.advancedanalytics.generali.com/ge-it-aa/staging/"
         PYPI_REPO_STABLE = "http://pypi.advancedanalytics.generali.com/ge-it-aa/stable/"
@@ -37,7 +33,7 @@ pipeline {
                 sh '''
                 ${env.PYTHON_INTERPRETER} -m venv venv
                 . venv/bin/activate
-                ${env.PYTHON_INTERPRETER} -m pip install pip tox --upgrade
+                ${env.PYTHON_INTERPRETER} -m pip install -r requirements_dev.txt
                 ${env.PYTHON_INTERPRETER} -m tox
                 '''
             }
@@ -138,8 +134,8 @@ pipeline {
 
             steps{
                 // Here you should copy all files that are needed by the Google Cloud Function
-                sh("cp -r {{cookiecutter.package_name}}/* gcf/")
-                sh("cp requirements_dev.txt gcf/requirements.txt")
+                sh("cp -r src/* gcf/")
+                sh("cp requirements.txt gcf/requirements.txt")
                 sh("gsutil cp gs://{{cookiecutter.project_bucket}}/{{cookiecutter.pipeline_path}} gcf/static_files/")
                 // A Google Cloud Function named as the project will be deployed
                 sh("gcloud functions deploy {{ cookiecutter.gcf_name }} \
