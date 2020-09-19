@@ -15,6 +15,7 @@
   "use_sql": ["y", "n"],
   "use_pycharm": ["y", "n"],
   "release_pypi": ["y", "n"],
+  "use_jupyter": ["y", "n"],
   "command_line_interface": [
     "Click",
     "Argparse",

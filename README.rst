@@ -2,7 +2,8 @@
 Advanced Analytics Python Package
 =================================
 
-Cookiecutter_ template for a standard Python package, with optional FrEEdAA enabled.
+Cookiecutter_ template for a standard Python package, with optional FrEEdAA enabled, ready to be used
+by our Generali Italia Advanced Analytics team, easy to use fot both Data Engineer and Data Scientist.
 
 * Gitlab repo: https://gitlab.advancedanalytics.generali.com/aa-generali-italia/aa-pypackage
 * Original GitHub repo: https://github.com/audreyr/cookiecutter-pypackage/
@@ -41,8 +42,7 @@ Then:
 * Create a Jenkins-CI_ pipeline on https://jenkins.advancedanalytics.generali.com.
 * Install the dev requirements into a virtualenv. (``pip install -r requirements_dev.txt``)
 * Release your package by pushing a new tag to master.
-* Add a `requirements.txt` file that specifies the packages you will need for
-  your project and their versions. For more info see the `pip docs for requirements files`_.
+* Update according to your needs the `setup.cfg` file, adding your project dependencies to its `install_requires` configuration
 
 .. _`pip docs for requirements files`: https://pip.pypa.io/en/stable/user_guide/#requirements-files
 .. _Register: https://packaging.python.org/tutorials/packaging-projects/#uploading-the-distribution-archives
