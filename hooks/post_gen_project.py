@@ -24,7 +24,7 @@ if __name__ == '__main__':
         cli_file = os.path.join('{{ cookiecutter.package_name }}', 'cli.py')
         remove_file(cli_file)
 
-    if '{{ cookiecutter.use_freedaa }}' != 'y':
+    if '{{ cookiecutter.use_gcf }}' != 'y':
         remove_folder('gcf')
 
     if '{{ cookiecutter.use_sql }}' != 'y':

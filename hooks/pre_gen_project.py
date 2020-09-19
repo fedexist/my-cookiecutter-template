@@ -11,3 +11,9 @@ if not re.match(MODULE_REGEX, module_name):
 
     #Exit to cancel project
     sys.exit(1)
+
+
+if '{{ cookiecutter.use_gcf }}' == 'y' and '{{ cookiecutter.gcf_python_runtime }}' not in {'python38', 'python37'}:
+    print("ERROR: The chosen Google Cloud Function runtime (%s) is not valid. "
+          "Please use one between 'python38' and 'python37'.".format('{{ cookiecutter.gcf_python_runtime }}'))
+    sys.exit(1)

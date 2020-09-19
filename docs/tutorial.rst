@@ -58,14 +58,14 @@ You'll be asked to enter a bunch of values to set the package up.
 If you don't know what to enter, stick with the defaults.
 
 
-Step 3: Create a GitHub Repo
+Step 3: Create a Gitlab Repo
 ----------------------------
 
-Go to your GitHub account and create a new repo named ``mypackage``, where ``mypackage`` matches the ``[project_slug]`` from your answers to running cookiecutter. This is so that Travis CI and pyup.io can find it when we get to Step 5.
+Go to your Gitlab account and create a new repo named ``mypackage``, where ``mypackage`` matches the ``[project_slug]`` from your answers to running cookiecutter. This is so that Travis CI and pyup.io can find it when we get to Step 5.
 
 ``If your virtualenv folder is within your project folder, be sure to add the virtualenv folder name to your .gitignore file.``
 
-You will find one folder named after the ``[project_slug]``. Move into this folder, and then setup git to use your GitHub repo and upload the code:
+You will find one folder named after the ``[project_slug]``. Move into this folder, and then setup git to use your Gitlab repo and upload the code:
 
 .. code-block:: bash
 
@@ -101,7 +101,7 @@ Step 5: Set Up Travis CI
 
 `Travis CI org`_ [*]_ is a continuous integration tool used to prevent integration problems. Every commit to the master branch will trigger automated builds of the application.
 
-Login using your Github credentials. It may take a few minutes for Travis CI to load up a list of all your GitHub repos. They will be listed with boxes to the left of the repo name, where the boxes have an ``X`` in them, meaning it is not connected to Travis CI.
+Login using your Gitlab credentials. It may take a few minutes for Travis CI to load up a list of all your Gitlab repos. They will be listed with boxes to the left of the repo name, where the boxes have an ``X`` in them, meaning it is not connected to Travis CI.
 
 Add the public repo to your Travis CI account by clicking the ``X`` to switch it "on" in the box next to the ``mypackage`` repo. Do not try to follow the other instructions, that will be taken care of next.
 

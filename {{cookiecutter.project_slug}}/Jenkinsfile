@@ -33,7 +33,7 @@ pipeline {
                 sh '''
                 ${env.PYTHON_INTERPRETER} -m venv venv
                 . venv/bin/activate
-                ${env.PYTHON_INTERPRETER} -m pip install -r requirements_dev.txt
+                ${env.PYTHON_INTERPRETER} -m pip install tox
                 ${env.PYTHON_INTERPRETER} -m tox
                 '''
             }
@@ -106,7 +106,7 @@ pipeline {
                     expression {
                         return env.GIT_BRANCH == "origin/master"
                     }
-                    tag pattern: "\\d\\.\\d\\.\\d", comparator: "REGEXP";
+                    tag pattern: "\\d+\\.\\d+\\.\\d+" comparator: "REGEXP";
                 }
             }
 
@@ -120,7 +120,7 @@ pipeline {
             }
         }
 
-        {%- if cookiecutter.use_freedaa == 'y' -%}
+        {%- if cookiecutter.use_gcf == 'y' -%}
         stage("Deploy GCF") {
 
             when {
@@ -128,7 +128,7 @@ pipeline {
                     expression {
                         return env.GIT_BRANCH == "origin/master"
                     }
-                    tag pattern: "\\d\\.\\d\\.\\d", comparator: "REGEXP";
+                    tag pattern: "\\d+\\.\\d+\\.\\d+", comparator: "REGEXP";
                 }
             }
 
@@ -157,13 +157,12 @@ pipeline {
         }
         {% endif %}
 
-        /*
+        {%- if cookiecutter.release_pypi == 'y' -%}
         stage('Staging on PyPi') {
 
-            sh '''
-            make staging
-            '''
-
+            steps {
+                sh("make staging")
+            }
         }
 
         stage('Release on PyPi') {
@@ -173,16 +172,16 @@ pipeline {
                     expression {
                         return env.GIT_BRANCH == "origin/master"
                     }
-                    tag pattern: "\\d\\.\\d\\.\\d", comparator: "REGEXP";
+                    tag pattern: "\\d+\\.\\d+\\.\\d+", comparator: "REGEXP";
                 }
             }
 
+            steps {
+                sh("make release")
+            }
 
-            sh '''
-            make release
-            '''
-
-        }*/
+        }
+        {% endif %}
 
         stage('Generate and publish doc') {
 

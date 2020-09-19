@@ -14,18 +14,17 @@
   "init_venv": ["y", "n"],
   "use_sql": ["y", "n"],
   "use_pycharm": ["y", "n"],
+  "release_pypi": ["y", "n"],
   "command_line_interface": [
     "Click",
     "Argparse",
     "No command-line interface"
   ],
+  "use_gcf": ["n", "y"],
   "use_freedaa": ["n", "y"],
   "freeda_version": "0.0.1",
   "gcf_name": "{{cookiecutter.package_name}}_cf",
-  "gcf_python_runtime": [
-    "python38",
-    "python37"
-  ],
+  "gcf_python_runtime": "{{ cookiecutter.python_version.replace('.', '') }}",
   "gcf_trigger": [
     "http",
     "topic",

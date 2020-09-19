@@ -66,7 +66,7 @@ For Every Release
 
         git push
 
-#. Push the tags, creating the new release on both GitHub and PyPI:
+#. Push the tags, creating the new release on both Gitlab and PyPI:
 
     .. code-block:: bash
 

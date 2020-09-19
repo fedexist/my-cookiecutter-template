@@ -26,7 +26,7 @@ you through the process.
 From sources
 ------------
 
-The sources for {{ cookiecutter.project_name }} can be downloaded from the `Github repo`_.
+The sources for {{ cookiecutter.project_name }} can be downloaded from the `Gitlab repo`_.
 
 You can either clone the public repository:
 
@@ -47,5 +47,5 @@ Once you have a copy of the source, you can install it with:
     $ python setup.py install
 
 
-.. _Github repo: https://gitlab.advancedanalytics.generali.com/aa-generali-italia/{{ cookiecutter.project_slug }}
+.. _Gitlab repo: https://gitlab.advancedanalytics.generali.com/aa-generali-italia/{{ cookiecutter.project_slug }}
 .. _tarball: https://gitlab.advancedanalytics.generali.com/aa-generali-italia/{{ cookiecutter.project_slug }}/tarball/master
