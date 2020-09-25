@@ -14,6 +14,9 @@ full_name
 email
     Your email address.
 
+python_version
+    The Python version you want to use for your project. You can choose between python3.7 and python3.8 (Default is python3.8)
+
 project_name
     The name of your new Python package project. This is used in documentation, so spaces and any characters are fine here.
     
@@ -31,6 +34,9 @@ version
 
 gcp_project_id
     GCP project to be used by the Jenkinsfile and FrEEdAA
+
+confluence_parent_page
+    Name of the parent Confluent page under which the documentation will be published
 
 freedaa_version
     Version of FrEEdAA to be used. Ignored if use_gcf == 'n'.
@@ -70,8 +76,29 @@ The following package configuration options set up different features for your p
 use_pytest
     Whether to use pytest as test suite.
 
+init_git
+    Whether you want to initialize a git repository with the start-up of the project. It will also configures some git-hooks to be used for pre-commit and pre-push.
+
+init_venv
+    Whether you want to initialize the project with a virtual environment with the basic dependencies.
+
+use_sql
+    Whether you're going to use sql queries within your project.
+
+use_pycharm
+    Whether you're going to use PyCharm as IDE.
+
+release_pypi
+    Whether you want your package to be released on pypi.
+
+use_jupyter
+    Whether your project will have jupyter notebooks.
+
 command_line_interface
     Whether to create a console script using Click. Console script entry point will match the project_slug. Options: ['Click', "No command-line interface"]
 
 use_gcf
-    Whether to use FrEEdAA for the project and serving of the model
+    Whether to deploy a Google Cloud Function for the project and serving of the model
+
+use_freedaa
+    Whether you're going to use FrEEdAA as dependency for your project.

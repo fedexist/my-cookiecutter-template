@@ -33,16 +33,6 @@ if __name__ == '__main__':
     if '{{ cookiecutter.use_pycharm }}' != 'y':
         remove_folder('.idea')
 
-    if '{{cookiecutter.init_git}}' == 'y':
-        print("Now committing to git and creating git-hooks...")
-        os.system('git init')
-        os.system('mv git-hooks/* .git/hooks')
-        remove_folder('git-hooks')
-        os.system('git add .')
-        os.system('git commit -am "Initial commit"')
-    else:
-        remove_folder('git-hooks')
-
     if '{{ cookiecutter.init_venv }}' == 'y':
         print("Now initializing Python virtual environment...")
         os.system('{{cookiecutter.python_version}} -m venv venv')
@@ -58,3 +48,13 @@ if __name__ == '__main__':
                       'python -m ipykernel install --name={{ cookiecutter.project_slug }}-venv')
         else:
             remove_folder('ipynb')
+
+    if '{{cookiecutter.init_git}}' == 'y':
+        print("Now committing to git and creating git-hooks...")
+        os.system('git init')
+        os.system('mv git-hooks/* .git/hooks')
+        remove_folder('git-hooks')
+        os.system('git add .')
+        os.system('git commit -am "Initial commit"')
+    else:
+        remove_folder('git-hooks')

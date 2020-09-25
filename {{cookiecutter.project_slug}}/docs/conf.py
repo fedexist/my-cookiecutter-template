@@ -170,7 +170,7 @@ confluence_publish = True
 confluence_space_name = 'DE'
 confluence_parent_page = '{{cookiecutter.confluence_parent_page}}'
 confluence_server_url = 'https://aa-generali-italia.atlassian.net/wiki/'
-confluence_server_user = '{{cookiecutter.email}}'
+confluence_server_user = 'federico.dambrosio@generali.com'
 confluence_server_pass = os.getenv('CONFLUENCE_TOKEN')
 
 

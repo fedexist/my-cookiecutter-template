@@ -67,13 +67,16 @@ Go to your Gitlab account and create a new repo named ``mypackage``, where ``myp
 
 You will find one folder named after the ``[project_slug]``. Move into this folder, and then setup git to use your Gitlab repo and upload the code:
 
+.. note:: The initialization and first commit shown here are not needed
+          if you choose the option ``init_git`` while setting up your project
+
 .. code-block:: bash
 
     cd mypackage
     git init .
     git add .
     git commit -m "Initial skeleton."
-    git remote add origin git@github.com:myusername/mypackage.git
+    git remote add origin git@gitlab.advancedanalytics.generali.com:aa-generali-italia/mypackage.git
     git push -u origin master
 
 Where ``myusername`` and ``mypackage`` are adjusted for your username and package name.
@@ -96,80 +99,50 @@ Your virtualenv should still be activated. If it isn't, activate it now. Install
     pip install -r requirements_dev.txt
 
 
-Step 5: Set Up Travis CI
-------------------------
+Step 5: Set Up Jenkins (Ask your DE!)
+-------------------------------------
 
-`Travis CI org`_ [*]_ is a continuous integration tool used to prevent integration problems. Every commit to the master branch will trigger automated builds of the application.
+`Jenkins`_ is a continuous integration tool used to prevent integration problems. Every commit to the master branch will trigger automated builds of the application.
 
-Login using your Gitlab credentials. It may take a few minutes for Travis CI to load up a list of all your Gitlab repos. They will be listed with boxes to the left of the repo name, where the boxes have an ``X`` in them, meaning it is not connected to Travis CI.
+Follow the guide `provided in the Advanced Analytics wiki`_ to setup your Jenkins Pipeline.
 
-Add the public repo to your Travis CI account by clicking the ``X`` to switch it "on" in the box next to the ``mypackage`` repo. Do not try to follow the other instructions, that will be taken care of next.
-
-In your terminal, your virtualenv should still be activated. If it isn't, activate it now. Run the Travis CLI tool to do your Travis CI setup:
-
-.. code-block:: bash
-
-    travis encrypt --add deploy.password
-
-This will:
-
-* Encrypt your PyPI password in your Travis config.
-* Activate automated deployment on PyPI when you push a new tag to master branch.
-
-See :ref:`travis-pypi-setup` for more information.
-
-.. [*] For private projects go to `Travis CI com`_
-
-.. _`Travis CI org`: https://travis-ci.org/
-.. _`Travis CI com`: https://travis-ci.com/
+.. _`Jenkins`: https://jenkins.advancedanalytics.generali.com
+.. _`provided in the Advanced Analytics wiki`: https://aa-generali-italia.atlassian.net/wiki/spaces/DE/pages/1105592326/CI+CD+Gitlab+and+Jenkins?search_id=22711e42-46e3-4f8a-a2fd-aba090f21e3f#Jenkins-Setup
 
 
-Step 6: Set Up Read the Docs
-----------------------------
+Step 6: Set Up Your Confluence Documentation Page
+-------------------------------------------------
 
-`Read the Docs`_ hosts documentation for the open source community. Think of it as Continuous Documentation.
+You can host your documentation on the Advanced Analytics wiki. Think of it as Continuous Documentation.
 
-Log into your account at `Read the Docs`_ . If you don't have one, create one and log into it.
+In order to do it, create a page within the DE space and use that name during the creation of your project
+(``confluence_parent_page``).
 
-If you are not at your dashboard, choose the pull-down next to your username in the upper right, and select "My Projects". Choose the button to Import the repository and follow the directions.
+Now, each time you'll push a commit, Jenkins will upload your documentation on Confluence.
 
-Now your documentation will get rebuilt when you make documentation changes to your package.
 
-.. _`Read the Docs`: https://readthedocs.org/
-
-Step 7: Set Up pyup.io
-----------------------
-
-`pyup.io`_ is a service that helps you to keep your requirements files up to date. It sends you automated
-pull requests whenever there's a new release for one of your dependencies.
-
-To use it, create a new account at `pyup.io`_ or log into your existing account.
-
-Click on the green ``Add Repo`` button in the top left corner and select the repo you created in Step 3. A popup will
-ask you whether you want to pin your dependencies. Click on ``Pin`` to add the repo.
-
-Once your repo is set up correctly, the pyup.io badge will show your current update status.
-
-.. _`pyup.io`: https://pyup.io/
-
-Step 8: Release on PyPI
+Step 7: Release on PyPI
 -----------------------
 
-The Python Package Index or `PyPI`_ is the official third-party software repository for the Python programming language. Python developers intend it to be a comprehensive catalog of all open source Python packages.
+You may know Python Package Index or `PyPI`_ , the official third-party software repository for the Python programming language. Python developers intend it to be a comprehensive catalog of all open source Python packages.
+
+Advanced Analytics has its own private PyPI, where we distribute our own packages, which you can find `here`_.
 
 When you are ready, release your package the standard Python way.
 
 See `PyPI Help`_ for more information about submitting a package.
 
-Here's a release checklist you can use: https://gist.github.com/audreyr/5990987
+You can refer to this documentation's page pypi_release_checklist to find out how to manage properly a Python package release.
 
 .. _`PyPI`: https://pypi.python.org/pypi
 .. _`PyPI Help`: http://peterdowns.com/posts/first-time-with-pypi.html
-
+.. _`here`: http://pypi.advancedanalytics.generali.com/
 
 Having problems?
 ----------------
 
 Visit our :ref:`troubleshooting` page for help. If that doesn't help, go to our `Issues`_ page and create a new Issue. Be sure to give as much information as possible.
 
-.. _`Issues`: https://github.com/audreyr/cookiecutter-pypackage/issues
+Alternatively, you can find me on Slack or Microsoft Teams (Federico D'Ambrosio)
+
+.. _`Issues`: https://gitlab.advancedanalytics.generali.com/aa-generali-italia/aa-pypackage/issues

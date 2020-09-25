@@ -48,6 +48,12 @@ Then:
 .. _Register: https://packaging.python.org/tutorials/packaging-projects/#uploading-the-distribution-archives
 
 
+If you already have your own `cookiecutter.json` file, then
+
+1. Clone this repo
+2. Replace or update with your values the provided cookiecutter.json file
+3. Run ``cookiecutter aa-pypackage/ --no-input``
+
 Fork This / Create Your Own
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

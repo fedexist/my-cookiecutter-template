@@ -16,6 +16,7 @@ pipeline {
             }
         }
 
+        /*
         stage('Run tests') {
             environment {
                 ENV='TEST'
@@ -28,11 +29,11 @@ pipeline {
                 python3.8 -m tox
                 '''
             }
-        }
+        }*/
 
         stage('Generate and publish doc') {
             steps {
-                withCredentials([string(credentialsId: 'confluence-token', variable: 'CONFLUENCE_TOKEN')])
+                withCredentials([string(credentialsId: 'confluence-token', variable: 'CONFLUENCE_TOKEN')]) {
                     sh '''
                     cd docs
                     make confluence
