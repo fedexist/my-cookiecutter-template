@@ -16,8 +16,8 @@ pipeline {
             }
         }
 
-        /*
-        stage('Run tests') {
+
+        stage('Setup venv') {
             environment {
                 ENV='TEST'
             }
@@ -26,15 +26,16 @@ pipeline {
                 python3.8 -m venv venv
                 . venv/bin/activate
                 python3.8 -m pip install pip tox --upgrade
-                python3.8 -m tox
+                python3.8 -m pip install -r requirements_dev.txt
                 '''
             }
-        }*/
+        }
 
         stage('Generate and publish doc') {
             steps {
                 withCredentials([string(credentialsId: 'confluence-token', variable: 'CONFLUENCE_TOKEN')]) {
                     sh '''
+                    . venv/bin/activate
                     cd docs
                     make confluence
                     '''
