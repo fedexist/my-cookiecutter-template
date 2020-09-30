@@ -161,7 +161,9 @@ pipeline {
         stage('Staging on PyPi') {
 
             steps {
-                sh("make staging")
+                withCredentials([usernamePassword(credentialsId: 'pypi-credentials', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
+                    sh("make staging")
+                }
             }
         }
 
@@ -177,7 +179,9 @@ pipeline {
             }
 
             steps {
-                sh("make release")
+                withCredentials([usernamePassword(credentialsId: 'pypi-credentials', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
+                    sh("make release")
+                }
             }
 
         }
