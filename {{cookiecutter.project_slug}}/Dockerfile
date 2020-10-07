@@ -4,6 +4,9 @@ FROM python:3.8
 FROM python:3.7
 {% endif %}
 
+ARG PACKAGE_VERSION=dirty
+ENV PACKAGE_VERSION=$PACKAGE_VERSION
+
 LABEL mantainer="{{cookiecutter.full_name}} {{cookiecutter.email}}"\
       description="{{cookiecutter.project_short_description}}"
 
@@ -30,7 +33,7 @@ RUN apt-get update -y && \
 {%- if cookiecutter.release_pypi != 'y' -%}
  python -m pip install .
 {%- else -%}
- python -m pip install {{cookiecutter.package_name}}
+ python -m pip install {{cookiecutter.package_name}}==$PACKAGE_VERSION
 {% endif %}
 
 ENTRYPOINT ["python", "-m", "{{cookiecutter.package_name}}"]

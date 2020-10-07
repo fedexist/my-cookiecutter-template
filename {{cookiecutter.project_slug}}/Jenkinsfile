@@ -10,7 +10,6 @@ pipeline {
         BASE_IMAGE_NAME = "${env.GCR_URL}/${env.BASE_IMAGE}"
         DOCKER_IMAGE_TAG = sh(script: "echo ${GIT_BRANCH} | sed -r 's/[_/.?]+/-/g' | awk '{print tolower(\$0)}' | xargs -I@ echo @-${env.COMMIT_HASH}-${env.BUILD_NUMBER}", returnStdout: true).trim()
         PYTHON_INTERPRETER = '{{ cookiecutter.python_version }}'
-        RELEASE_TAG = sh(script:'git describe --tags --abbrev=0', , returnStdout: true).trim()
         PYPI_REPO_STAGING = "http://pypi.advancedanalytics.generali.com/ge-it-aa/staging/"
         PYPI_REPO_STABLE = "http://pypi.advancedanalytics.generali.com/ge-it-aa/stable/"
         CONFLUENCE_TOKEN = credentials('confluence-token')
@@ -21,6 +20,10 @@ pipeline {
         stage('Clone sources') {
             steps {
                 slackSend (color: '#FFFF00', message: "STARTED: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})")
+                sh '''
+                echo ${env.BRANCH_NAME}
+                echo ${env.TAG_NAME}
+                '''
                 checkout scm
             }
         }
@@ -33,7 +36,7 @@ pipeline {
                 sh '''
                 ${env.PYTHON_INTERPRETER} -m venv venv
                 . venv/bin/activate
-                ${env.PYTHON_INTERPRETER} -m pip install tox
+                ${env.PYTHON_INTERPRETER} -m pip install -r requirements_dev.txt
                 ${env.PYTHON_INTERPRETER} -m tox
                 '''
             }
@@ -51,10 +54,26 @@ pipeline {
             }
         }
 
+        {%- if cookiecutter.release_pypi == 'y' -%}
+        stage('Staging on PyPi') {
+
+            steps {
+                withCredentials([usernamePassword(credentialsId: 'pypi-credentials', usernameVariable: 'PYPI_USERNAME', passwordVariable: 'PYPI_PASSWORD')]) {
+                    sh """
+                    . venv/bin/activate
+                    make staging
+                    """
+                }
+            }
+        }
+        {% endif %}
+
+
         stage("Build Docker images") {
             steps {
                 script {
-                    docker_image_base = docker.build("${BASE_IMAGE_NAME}:${DOCKER_IMAGE_TAG}", "-f Dockerfile .")
+                    version = sh(script: "python3 setup.py --version", returnStdout: true).trim()
+                    docker_image_base = docker.build("${BASE_IMAGE_NAME}:${DOCKER_IMAGE_TAG}", "--build-arg PACKAGE_VERSION=$version -f Dockerfile .")
                 }
             }
         }
@@ -80,7 +99,9 @@ pipeline {
                 script {
 
                     withDockerRegistry(credentialsId: 'gcr:jenkins-service-account', url: "https://${env.GCR_URL}") {
+                        version = sh(script: "python3 setup.py --version | tr + .", returnStdout: true).trim()
                         docker_image_base.push()
+                        docker_image_base.push(version)
                     }
                 }
             }
@@ -99,6 +120,30 @@ pipeline {
             }
         }
 
+        {%- if cookiecutter.release_pypi == 'y' -%}
+        stage('Release on PyPi') {
+
+            when {
+                allOf {
+                    expression {
+                        return env.GIT_BRANCH == "origin/master"
+                    }
+                    tag ""
+                }
+            }
+
+            steps {
+                withCredentials([usernamePassword(credentialsId: 'pypi-credentials', usernameVariable: 'PYPI_USERNAME', passwordVariable: 'PYPI_PASSWORD')]) {
+                    sh """
+                    . venv/bin/activate
+                    make release
+                    """
+                }
+            }
+
+        }
+        {% endif %}
+
         stage("Push release images") {
 
             when {
@@ -106,7 +151,7 @@ pipeline {
                     expression {
                         return env.GIT_BRANCH == "origin/master"
                     }
-                    tag pattern: "\\d+\\.\\d+\\.\\d+" comparator: "REGEXP";
+                    tag "";
                 }
             }
 
@@ -114,7 +159,8 @@ pipeline {
                 script {
 
                     withDockerRegistry(credentialsId: 'gcr:jenkins-service-account', url: "https://${env.GCR_URL}") {
-                        docker_image_base.push(RELEASE_TAG)
+                        version = sh(script: "python3 setup.py --version", returnStdout: true).trim()
+                        docker_image_base.push(version)
                     }
                 }
             }
@@ -128,7 +174,7 @@ pipeline {
                     expression {
                         return env.GIT_BRANCH == "origin/master"
                     }
-                    tag pattern: "\\d+\\.\\d+\\.\\d+", comparator: "REGEXP";
+                    tag ""
                 }
             }
 
@@ -157,35 +203,6 @@ pipeline {
         }
         {% endif %}
 
-        {%- if cookiecutter.release_pypi == 'y' -%}
-        stage('Staging on PyPi') {
-
-            steps {
-                withCredentials([usernamePassword(credentialsId: 'pypi-credentials', usernameVariable: 'PYPI_USERNAME', passwordVariable: 'PYPI_PASSWORD')]) {
-                    sh("make staging")
-                }
-            }
-        }
-
-        stage('Release on PyPi') {
-
-            when {
-                allOf {
-                    expression {
-                        return env.GIT_BRANCH == "origin/master"
-                    }
-                    tag pattern: "\\d+\\.\\d+\\.\\d+", comparator: "REGEXP";
-                }
-            }
-
-            steps {
-                withCredentials([usernamePassword(credentialsId: 'pypi-credentials', usernameVariable: 'PYPI_USERNAME', passwordVariable: 'PYPI_PASSWORD')]) {
-                    sh("make release")
-                }
-            }
-
-        }
-        {% endif %}
 
         stage('Generate and publish doc') {
 
@@ -194,13 +211,15 @@ pipeline {
             }
             steps {
                 withCredentials([usernamePassword(credentialsId: 'pypi-credentials', usernameVariable: 'PYPI_USERNAME', passwordVariable: 'PYPI_PASSWORD')]) {
+
+                    version = sh(script: "python3 setup.py --version", returnStdout: true).trim()
                     sh '''
                     cd docs
                     make confluence
                     make html
-                    zip -r {{cookiecutter.package_name}}-$RELEASE_TAG.doc.zip docs/_build/html
+                    zip -r {{cookiecutter.package_name}}-$version.doc.zip docs/_build/html
                     devpi login ${USERNAME} --password=${PASSWORD}
-                    devpi upload --index ${PYPI_REPO_STAGING} --index ${PYPI_REPO_STABLE} {{cookiecutter.package_name}}-$RELEASE_TAG.doc.zip
+                    devpi upload --index ${PYPI_REPO_STAGING} --index ${PYPI_REPO_STABLE} {{cookiecutter.package_name}}-$version.doc.zip
                     '''
                 }
             }
