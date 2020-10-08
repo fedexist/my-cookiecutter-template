@@ -16,6 +16,7 @@ COPY resources /{{cookiecutter.project_slug}}/
 COPY setup.py /{{cookiecutter.project_slug}}/
 COPY setup.cfg /{{cookiecutter.project_slug}}/
 {%- else -%}
+
 RUN echo -e "\
 [install] \n\
 index-url = https://pypi.python.org/simple/ \n\
