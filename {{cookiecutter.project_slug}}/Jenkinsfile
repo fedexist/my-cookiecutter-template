@@ -20,10 +20,10 @@ pipeline {
         stage('Clone sources') {
             steps {
                 slackSend (color: '#FFFF00', message: "STARTED: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})")
-                sh '''
+                sh """
                 echo ${env.BRANCH_NAME}
                 echo ${env.TAG_NAME}
-                '''
+                """
                 checkout scm
             }
         }
@@ -33,12 +33,12 @@ pipeline {
                 ENV='TEST'
             }
             steps {
-                sh '''
+                sh """
                 ${env.PYTHON_INTERPRETER} -m venv venv
                 . venv/bin/activate
                 ${env.PYTHON_INTERPRETER} -m pip install -r requirements_dev.txt
                 ${env.PYTHON_INTERPRETER} -m tox
-                '''
+                """
             }
         }
 
@@ -213,14 +213,14 @@ pipeline {
                 withCredentials([usernamePassword(credentialsId: 'pypi-credentials', usernameVariable: 'PYPI_USERNAME', passwordVariable: 'PYPI_PASSWORD')]) {
 
                     version = sh(script: "python3 setup.py --version", returnStdout: true).trim()
-                    sh '''
+                    sh """
                     cd docs
                     make confluence
                     make html
                     zip -r {{cookiecutter.package_name}}-$version.doc.zip docs/_build/html
                     devpi login ${USERNAME} --password=${PASSWORD}
                     devpi upload --index ${PYPI_REPO_STAGING} --index ${PYPI_REPO_STABLE} {{cookiecutter.package_name}}-$version.doc.zip
-                    '''
+                    """
                 }
             }
 
