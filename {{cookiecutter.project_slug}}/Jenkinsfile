@@ -167,7 +167,7 @@ pipeline {
                     }
 
                     expression {
-                        return env.TAG_NAME != null
+                        return sh(returnStdout: true, script: "git tag --contains").trim()
                     }
 
                 }
@@ -194,7 +194,7 @@ pipeline {
                     }
 
                     expression {
-                        return env.TAG_NAME != null
+                        return sh(returnStdout: true, script: "git tag --contains").trim()
                     }
 
                 }
@@ -220,7 +220,7 @@ pipeline {
                         return env.GIT_BRANCH == "origin/master"
                     }
                     expression {
-                        return env.TAG_NAME != null
+                        return sh(returnStdout: true, script: "git tag --contains").trim()
                     }
 
                 }
@@ -261,7 +261,7 @@ pipeline {
                     }
 
                     expression {
-                        return env.TAG_NAME != null
+                        return sh(returnStdout: true, script: "git tag --contains").trim()
                     }
 
                 }
