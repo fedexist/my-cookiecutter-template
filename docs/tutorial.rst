@@ -15,6 +15,23 @@ To start with, you will need a `Gitlab account`_. Create these before you get st
 Step 1: Install Cookiecutter
 ----------------------------
 
+Alternative A: Use your python system distribution
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Install cookiecutter:
+
+.. code-block:: bash
+
+    pip install cookiecutter
+    # It can be
+    # python3.7 -m pip install cookiecutter
+    # python3.8 -m pip install cookiecutter
+    # Whatever suits your need, we only need the command cookiecutter to be installed on your system
+
+
+Alternative B: Use a virtual environment for cookiecutter
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 First, you need to create and activate a virtualenv for the package project. Use your favorite method, or create a virtualenv for your new package like this:
 
 .. code-block:: bash
@@ -98,8 +115,13 @@ Your virtualenv should still be activated. If it isn't, activate it now. Install
 
     pip install -r requirements_dev.txt
 
+Step 5: Add your dependencies
+-----------------------------
 
-Step 5: Set Up Jenkins (Ask your DE!)
+Add your dependencies in the ``setup.cfg`` file, in the section named ``install_requires``.
+
+
+Step 6: Set Up Jenkins (Ask your DE!)
 -------------------------------------
 
 `Jenkins`_ is a continuous integration tool used to prevent integration problems. Every commit to the master branch will trigger automated builds of the application.
@@ -110,7 +132,7 @@ Follow the guide `provided in the Advanced Analytics wiki`_ to setup your Jenkin
 .. _`provided in the Advanced Analytics wiki`: https://aa-generali-italia.atlassian.net/wiki/spaces/DE/pages/1105592326/CI+CD+Gitlab+and+Jenkins?search_id=22711e42-46e3-4f8a-a2fd-aba090f21e3f#Jenkins-Setup
 
 
-Step 6: Set Up Your Confluence Documentation Page
+Step 7: Set Up Your Confluence Documentation Page
 -------------------------------------------------
 
 You can host your documentation on the Advanced Analytics wiki. Think of it as Continuous Documentation.
@@ -121,7 +143,7 @@ In order to do it, create a page within the DE space and use that name during th
 Now, each time you'll push a commit, Jenkins will upload your documentation on Confluence.
 
 
-Step 7: Release on PyPI
+Step 8: Release on PyPI
 -----------------------
 
 You may know Python Package Index or `PyPI`_ , the official third-party software repository for the Python programming language. Python developers intend it to be a comprehensive catalog of all open source Python packages.

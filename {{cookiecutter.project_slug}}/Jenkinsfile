@@ -105,7 +105,7 @@ pipeline {
         }
 
 
-
+        {%- if cookiecutter.use_docker == 'y' -%}
         stage("Build Docker images") {
             steps {
                 script {
@@ -156,6 +156,7 @@ pipeline {
                 }
             }
         }
+        {% endif %}
 
         {%- if cookiecutter.release_pypi == 'y' -%}
         stage('Release on PyPi') {
@@ -185,6 +186,7 @@ pipeline {
         }
         {% endif %}
 
+        {%- if cookiecutter.use_docker == 'y' -%}
         stage("Push release images") {
 
             when {
@@ -210,6 +212,7 @@ pipeline {
                 }
             }
         }
+        {% endif %}
 
         {%- if cookiecutter.use_gcf == 'y' -%}
         stage("Deploy GCF") {

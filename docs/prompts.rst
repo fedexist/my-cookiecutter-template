@@ -39,39 +39,42 @@ confluence_parent_page
     Name of the parent Confluent page under which the documentation will be published
 
 freedaa_version
-    Version of FrEEdAA to be used. Ignored if use_gcf == 'n'.
+    Version of FrEEdAA to be used. **Ignored if use_gcf == 'n'**.
 
 gcf_name
-    Name of the Google Cloud Function to be deployed. Ignored if use_gcf == 'n'.
+    Name of the Google Cloud Function to be deployed. **Ignored if use_gcf == 'n'**.
 
 gcf_python_runtime
-    Python runtime to be used by the Google Cloud Function. Ignored if use_gcf == 'n'.
+    Python runtime to be used by the Google Cloud Function. **Ignored if use_gcf == 'n'**.
 
 gcf_trigger
-    Trigger to be used by the Google Cloud Function (http, pubsub topic or gcs bucket). Ignored if use_gcf == 'n'.
+    Trigger to be used by the Google Cloud Function (http, pubsub topic or gcs bucket). **Ignored if use_gcf == 'n'**.
 
 gcf_topic
-    PubSub topic to be used as trigger by the Google Cloud Function. Ignored if use_gcf == 'n'.
+    PubSub topic to be used as trigger by the Google Cloud Function. **Ignored if use_gcf == 'n'**.
 
 gcf_bucket
-    Google Cloud Storage bucket to be used as trigger by the Google Cloud Function. Ignored if use_gcf == 'n'.
+    Google Cloud Storage bucket to be used as trigger by the Google Cloud Function. **Ignored if use_gcf == 'n'**.
 
 gcf_memory
-    Memory to be used by the Google Cloud Function. Ignored if use_gcf == 'n'.
+    Memory to be used by the Google Cloud Function. **Ignored if use_gcf == 'n'**.
 
 gcf_service_account
-    Service Account to be impersonated by the Google Cloud Function. Ignored if use_gcf == 'n'.
+    Service Account to be impersonated by the Google Cloud Function. **Ignored if use_gcf == 'n'**.
 
 project_bucket
-    Bucket to be associated to the Google Cloud Function (it would contain the FrEEdAA trained pipeline). Ignored if use_gcf == 'n'.
+    Bucket to be associated to the Google Cloud Function (it would contain the FrEEdAA trained pipeline). **Ignored if use_gcf == 'n'**.
 
 pipeline_path
-    Path within the specified project_bucket where we would find the FrEEdAA trained pipeline. Ignored if use_gcf == 'n'.
+    Path within the specified project_bucket where we would find the FrEEdAA trained pipeline. **Ignored if use_gcf == 'n'**.
 
 Options
 -------
 
 The following package configuration options set up different features for your project.
+
+use_docker
+    Whether you need a Docker image for you project
 
 use_pytest
     Whether to use pytest as test suite.
@@ -89,7 +92,7 @@ use_pycharm
     Whether you're going to use PyCharm as IDE.
 
 release_pypi
-    Whether you want your package to be released on pypi.
+    Whether you want your package to be released on pypi. This will cause
 
 use_jupyter
     Whether your project will have jupyter notebooks.
