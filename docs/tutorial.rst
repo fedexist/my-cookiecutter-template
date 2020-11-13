@@ -16,7 +16,7 @@ Step 1: Install Cookiecutter
 ----------------------------
 
 Alternative A: Use your python system distribution
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Install cookiecutter:
 

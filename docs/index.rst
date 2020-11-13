@@ -23,6 +23,8 @@ Basics
    :maxdepth: 2
 
    prompts
+   features
+   faq
 
 Advanced Features
 -----------------
