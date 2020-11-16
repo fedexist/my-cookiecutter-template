@@ -58,11 +58,13 @@ pipeline {
         stage('Staging on PyPi') {
 
             steps {
-                withCredentials([usernamePassword(credentialsId: 'pypi-credentials', usernameVariable: 'PYPI_USERNAME', passwordVariable: 'PYPI_PASSWORD')]) {
-                    sh """
-                    . venv/bin/activate
-                    make staging
-                    """
+                script {
+                    withCredentials([usernamePassword(credentialsId: 'pypi-credentials', usernameVariable: 'PYPI_USERNAME', passwordVariable: 'PYPI_PASSWORD')]) {
+                        sh """
+                        . venv/bin/activate
+                        make staging
+                        """
+                    }
                 }
             }
         }
@@ -70,35 +72,23 @@ pipeline {
 
         stage('Generate and publish doc staging') {
 
-           when {
-                allOf {
-                    expression {
-                        return env.GIT_BRANCH == "origin/master"
-                    }
-
-                    expression {
-                        return env.TAG_NAME != null
-                    }
-
-                }
-            }
-
-
             steps {
-                withCredentials([usernamePassword(credentialsId: 'pypi-credentials', usernameVariable: 'PYPI_USERNAME', passwordVariable: 'PYPI_PASSWORD')]) {
+                script {
+                    withCredentials([usernamePassword(credentialsId: 'pypi-credentials', usernameVariable: 'PYPI_USERNAME', passwordVariable: 'PYPI_PASSWORD')]) {
 
-                    version = sh(script: "python3 setup.py --version", returnStdout: true).trim()
-                    sh """
-                    . venv/bin/activate
-                    ${env.PYTHON_INTERPRETER} -m pip install .
-                    ${env.PYTHON_INTERPRETER} -m pip install devpi-client
-                    cd docs
-                    make html
-                    cd _build/html && zip -r freedaa-${version}.doc.zip . && cd -
-                    devpi use ${PYPI_REPO_STAGING}
-                    devpi login ${USERNAME} --password=${PASSWORD}
-                    devpi upload _build/html/{{cookiecutter.package_name}}-${version}.doc.zip
-                    """
+                        version = sh(script: "python3 setup.py --version", returnStdout: true).trim()
+                        sh """
+                        . venv/bin/activate
+                        ${env.PYTHON_INTERPRETER} -m pip install .
+                        ${env.PYTHON_INTERPRETER} -m pip install devpi-client
+                        cd docs
+                        make html
+                        cd _build/html && zip -r {{cookiecutter.package_name}}-${version}.doc.zip . && cd -
+                        devpi use ${PYPI_REPO_STAGING}
+                        devpi login ${USERNAME} --password=${PASSWORD}
+                        devpi upload _build/html/{{cookiecutter.package_name}}-${version}.doc.zip
+                        """
+                    }
                 }
             }
 
@@ -175,11 +165,13 @@ pipeline {
             }
 
             steps {
-                withCredentials([usernamePassword(credentialsId: 'pypi-credentials', usernameVariable: 'PYPI_USERNAME', passwordVariable: 'PYPI_PASSWORD')]) {
-                    sh """
-                    . venv/bin/activate
-                    make release
-                    """
+                script {
+                    withCredentials([usernamePassword(credentialsId: 'pypi-credentials', usernameVariable: 'PYPI_USERNAME', passwordVariable: 'PYPI_PASSWORD')]) {
+                        sh """
+                        . venv/bin/activate
+                        make release
+                        """
+                    }
                 }
             }
 
@@ -268,25 +260,27 @@ pipeline {
                     }
 
                 }
-            }
+           }
 
 
             steps {
-                withCredentials([usernamePassword(credentialsId: 'pypi-credentials', usernameVariable: 'PYPI_USERNAME', passwordVariable: 'PYPI_PASSWORD')]) {
+                script {
+                    withCredentials([usernamePassword(credentialsId: 'pypi-credentials', usernameVariable: 'PYPI_USERNAME', passwordVariable: 'PYPI_PASSWORD')]) {
 
-                    version = sh(script: "python3 setup.py --version", returnStdout: true).trim()
-                    sh """
-                    . venv/bin/activate
-                    ${env.PYTHON_INTERPRETER} -m pip install .
-                    ${env.PYTHON_INTERPRETER} -m pip install devpi-client
-                    cd docs
-                    make confluence
-                    make html
-                    cd _build/html && zip -r freedaa-${version}.doc.zip . && cd -
-                    devpi use ${PYPI_REPO_STABLE}
-                    devpi login ${USERNAME} --password=${PASSWORD}
-                    devpi upload _build/html/{{cookiecutter.package_name}}-${version}.doc.zip
-                    """
+                        version = sh(script: "python3 setup.py --version", returnStdout: true).trim()
+                        sh """
+                        . venv/bin/activate
+                        ${env.PYTHON_INTERPRETER} -m pip install .
+                        ${env.PYTHON_INTERPRETER} -m pip install devpi-client
+                        cd docs
+                        make confluence
+                        make html
+                        cd _build/html && zip -r {{cookiecutter.package_name}}-${version}.doc.zip . && cd -
+                        devpi use ${PYPI_REPO_STABLE}
+                        devpi login ${USERNAME} --password=${PASSWORD}
+                        devpi upload _build/html/{{cookiecutter.package_name}}-${version}.doc.zip
+                        """
+                    }
                 }
             }
 

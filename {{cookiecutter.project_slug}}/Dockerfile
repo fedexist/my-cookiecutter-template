@@ -1,7 +1,7 @@
-{%- if cookiecutter.python_version == 'python38' -%}
-FROM python:3.8
-{%- elif cookiecutter.python_version == 'python37' -%}
-FROM python:3.7
+{%- if cookiecutter.python_version == 'python3.8' -%}
+FROM python:3.8-slim
+{%- elif cookiecutter.python_version == 'python3.7' -%}
+FROM python:3.7-slim
 {% endif %}
 
 ARG PACKAGE_VERSION=dirty
@@ -10,14 +10,13 @@ ENV PACKAGE_VERSION=$PACKAGE_VERSION
 LABEL mantainer="{{cookiecutter.full_name}} {{cookiecutter.email}}"\
       description="{{cookiecutter.project_short_description}}"
 
+
 {%- if cookiecutter.release_pypi != 'y' -%}
 COPY src /{{cookiecutter.project_slug}}/
-COPY resources /{{cookiecutter.project_slug}}/
 COPY setup.py /{{cookiecutter.project_slug}}/
 COPY setup.cfg /{{cookiecutter.project_slug}}/
 {%- else -%}
-
-RUN echo -e "\
+RUN echo "\
 [install] \n\
 index-url = https://pypi.python.org/simple/ \n\
 extra-index-url = \n\
@@ -31,6 +30,7 @@ trusted-host = pypi.advancedanalytics.generali.com\
 WORKDIR /{{cookiecutter.project_slug}}
 
 RUN apt-get update -y && \
+
 {%- if cookiecutter.release_pypi != 'y' -%}
  python -m pip install .
 {%- else -%}
