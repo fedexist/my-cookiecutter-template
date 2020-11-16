@@ -82,7 +82,7 @@ staging: dist
 	twine upload -u ${PYPI_USERNAME} -p ${PYPI_PASSWORD} --repository-url ${PYPI_REPO_STAGING} dist/*
 
 release: dist ## package and upload a release
-	twine upload -u ${PYPI_USERNAME} -p ${PYPI_PASSWORD} --repository-url ${PYPI_REPO_RELEASE} dist/*
+	twine upload -u ${PYPI_USERNAME} -p ${PYPI_PASSWORD} --repository-url ${PYPI_REPO_STABLE} dist/*
 
 dist: clean ## builds source and wheel package
 	python setup.py sdist

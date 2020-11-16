@@ -11,7 +11,7 @@ pipeline {
         DOCKER_IMAGE_TAG = sh(script: "echo ${GIT_BRANCH} | sed -r 's/[_/.?]+/-/g' | awk '{print tolower(\$0)}' | xargs -I@ echo @-${env.COMMIT_HASH}-${env.BUILD_NUMBER}", returnStdout: true).trim()
         PYTHON_INTERPRETER = '{{ cookiecutter.python_version }}'
         PYPI_REPO_STAGING = "http://pypi.advancedanalytics.generali.com/ge-it-aa/staging/"
-        PYPI_REPO_RELEASE = "http://pypi.advancedanalytics.generali.com/ge-it-aa/stable/"
+        PYPI_REPO_STABLE = "http://pypi.advancedanalytics.generali.com/ge-it-aa/stable/"
         CONFLUENCE_TOKEN = credentials('confluence-token')
     }
 
