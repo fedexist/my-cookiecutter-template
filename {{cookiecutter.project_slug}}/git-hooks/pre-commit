@@ -1,1 +1,1 @@
-tox -e py37,py38
+source venv/bin/activate && tox -e py37,py38

@@ -1,1 +1,1 @@
-tox -e py37,py38,flake8
+source venv/bin/activate && tox

@@ -27,6 +27,15 @@ Features
 Quickstart
 ----------
 
+.. note::
+   Before you start using ``aa-pypackage``, make sure you have the commands python3.7 and python3.8 available in your PATH.
+
+   In order to make sure of this, execute ``python3.7 --version`` and ``python3.8 --version``.
+
+   If you don't have them installed, please install the required python distributions (by using ``brew``, ``pyenv`` or whatever it is
+   your preferred method of installation) and/or set the appropriate aliases, if needed.
+
+
 Install the latest Cookiecutter if you haven't installed it yet (this requires
 Cookiecutter 1.4.0 or higher)::
 
