@@ -13,6 +13,7 @@ pipeline {
         PYPI_REPO_STAGING = "http://pypi.advancedanalytics.generali.com/ge-it-aa/staging/"
         PYPI_REPO_STABLE = "http://pypi.advancedanalytics.generali.com/ge-it-aa/stable/"
         CONFLUENCE_TOKEN = credentials('confluence-token')
+        REMOVE_DOCKER_IMAGES = false
     }
 
     stages {
@@ -24,7 +25,7 @@ pipeline {
                 echo ${env.BRANCH_NAME}
                 echo ${env.TAG_NAME}
                 """
-                checkout scm
+                git branch: env.gitlabSourceBranch, poll: false, credentialsId: '2bd6f462-e60e-4de9-a67c-da11e3829363', url: env.gitlabSourceRepoHttpUrl
             }
         }
 
@@ -101,6 +102,7 @@ pipeline {
                 script {
                     version = sh(script: "python3 setup.py --version", returnStdout: true).trim()
                     docker_image_base = docker.build("${BASE_IMAGE_NAME}:${DOCKER_IMAGE_TAG}", "--build-arg PACKAGE_VERSION=$version -f Dockerfile .")
+                    built_images = true
                 }
             }
         }
@@ -111,12 +113,9 @@ pipeline {
                     //We can accept LOW/MEDIUM/HIGH Vulnerabilities
                     sh "trivy --exit-code 0 --severity LOW,MEDIUM,HIGH \"${env.BASE_IMAGE_NAME}:${DOCKER_IMAGE_TAG}\""
 
-                    //We cannot accept CRITICAL Vulnerabilities
-                    //Yes, we can if there's no fix available
+                    // We cannot accept CRITICAL Vulnerabilities
+                    // Yes, we can if there's no fix available
                     // sh "trivy --exit-code 1 --severity CRITICAL \"${env.BASE_IMAGE_NAME}:${COMMIT_HASH}\""
-                    // sh "trivy --exit-code 1 --severity CRITICAL \"${env.SERVER_IMAGE_TAG}:${COMMIT_HASH}\""
-                    // sh "trivy --exit-code 1 --severity CRITICAL \"${env.LISTENER_IMAGE_TAG}:${COMMIT_HASH}\""
-
                 }
             }
         }
@@ -291,6 +290,12 @@ pipeline {
     post {
         always {
             cleanWs deleteDirs: true, disableDeferredWipeout: true, patterns: [[pattern: '', type: 'INCLUDE']]
+            script {
+                if(built_images){
+                    sh 'docker images -a | grep "${GCR_URL}/${APP_ID}" | grep "${DOCKER_IMAGE_TAG}" | awk \'{print $3}\' | xargs docker rmi -f'
+                }
+            }
+
         }
         success {
             slackSend (color: '#00FF00', message: "SUCCESSFUL: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})")
