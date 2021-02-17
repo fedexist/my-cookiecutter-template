@@ -55,7 +55,8 @@ pipeline {
             }
         }
 
-        {%- if cookiecutter.release_pypi == 'y' -%}
+
+{%- if cookiecutter.release_pypi == 'y' -%}
         stage('Staging on PyPi') {
 
             steps {
@@ -69,7 +70,8 @@ pipeline {
                 }
             }
         }
-        {% endif %}
+{% endif %}
+
 
         stage('Generate and publish doc staging') {
 
@@ -86,7 +88,7 @@ pipeline {
                         make html
                         cd _build/html && zip -r {{cookiecutter.package_name}}-${version}.doc.zip . && cd -
                         devpi use ${PYPI_REPO_STAGING}
-                        devpi login ${USERNAME} --password=${PASSWORD}
+                        devpi login ${PYPI_USERNAME} --password=${PYPI_PASSWORD}
                         devpi upload _build/html/{{cookiecutter.package_name}}-${version}.doc.zip
                         """
                     }
@@ -96,7 +98,7 @@ pipeline {
         }
 
 
-        {%- if cookiecutter.use_docker == 'y' -%}
+{%- if cookiecutter.use_docker == 'y' -%}
         stage("Build Docker images") {
             steps {
                 script {
@@ -145,9 +147,10 @@ pipeline {
                 }
             }
         }
-        {% endif %}
+{% endif %}
 
-        {%- if cookiecutter.release_pypi == 'y' -%}
+
+{%- if cookiecutter.release_pypi == 'y' -%}
         stage('Release on PyPi') {
 
             when {
@@ -175,9 +178,10 @@ pipeline {
             }
 
         }
-        {% endif %}
+{% endif %}
 
-        {%- if cookiecutter.use_docker == 'y' -%}
+
+{%- if cookiecutter.use_docker == 'y' -%}
         stage("Push release images") {
 
             when {
@@ -203,9 +207,9 @@ pipeline {
                 }
             }
         }
-        {% endif %}
+{% endif %}
 
-        {%- if cookiecutter.use_gcf == 'y' -%}
+{%- if cookiecutter.use_gcf == 'y' -%}
         stage("Deploy GCF") {
 
             when {
@@ -243,7 +247,7 @@ pipeline {
                         --source=gcf/")
             }
         }
-        {% endif %}
+{% endif %}
 
 
         stage('Generate and publish doc release') {
@@ -276,7 +280,7 @@ pipeline {
                         make html
                         cd _build/html && zip -r {{cookiecutter.package_name}}-${version}.doc.zip . && cd -
                         devpi use ${PYPI_REPO_STABLE}
-                        devpi login ${USERNAME} --password=${PASSWORD}
+                        devpi login ${PYPI_USERNAME} --password=${PYPI_PASSWORD}
                         devpi upload _build/html/{{cookiecutter.package_name}}-${version}.doc.zip
                         """
                     }
