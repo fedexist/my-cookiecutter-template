@@ -12,10 +12,13 @@ LABEL mantainer="{{cookiecutter.full_name}} {{cookiecutter.email}}"\
 
 
 {%- if cookiecutter.release_pypi != 'y' -%}
+
 COPY src /{{cookiecutter.project_slug}}/
 COPY setup.py /{{cookiecutter.project_slug}}/
 COPY setup.cfg /{{cookiecutter.project_slug}}/
+
 {%- else -%}
+
 RUN echo "\
 [install] \n\
 index-url = https://pypi.python.org/simple/ \n\
@@ -24,6 +27,7 @@ extra-index-url = \n\
     http://pypi.advancedanalytics.generali.com/ge-it-aa/stable \n\
 trusted-host = pypi.advancedanalytics.generali.com\
 " > /etc/pip.conf
+
 {% endif %}
 
 
@@ -32,9 +36,13 @@ WORKDIR /{{cookiecutter.project_slug}}
 RUN apt-get update -y && \
 
 {%- if cookiecutter.release_pypi != 'y' -%}
+
  python -m pip install .
+
 {%- else -%}
+
  python -m pip install {{cookiecutter.package_name}}==$PACKAGE_VERSION
+
 {% endif %}
 
 ENTRYPOINT ["python", "-m", "{{cookiecutter.package_name}}"]

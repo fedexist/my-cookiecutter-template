@@ -1,3 +1,5 @@
+def built_images
+
 pipeline {
     agent any
 
@@ -13,7 +15,6 @@ pipeline {
         PYPI_REPO_STAGING = "http://pypi.advancedanalytics.generali.com/ge-it-aa/staging/"
         PYPI_REPO_STABLE = "http://pypi.advancedanalytics.generali.com/ge-it-aa/stable/"
         CONFLUENCE_TOKEN = credentials('confluence-token')
-        REMOVE_DOCKER_IMAGES = false
     }
 
     stages {
@@ -57,6 +58,7 @@ pipeline {
 
 
 {%- if cookiecutter.release_pypi == 'y' -%}
+
         stage('Staging on PyPi') {
 
             steps {
@@ -70,6 +72,7 @@ pipeline {
                 }
             }
         }
+
 {% endif %}
 
 
@@ -99,6 +102,7 @@ pipeline {
 
 
 {%- if cookiecutter.use_docker == 'y' -%}
+
         stage("Build Docker images") {
             steps {
                 script {
@@ -147,10 +151,12 @@ pipeline {
                 }
             }
         }
+
 {% endif %}
 
 
 {%- if cookiecutter.release_pypi == 'y' -%}
+
         stage('Release on PyPi') {
 
             when {
@@ -178,10 +184,12 @@ pipeline {
             }
 
         }
+
 {% endif %}
 
 
 {%- if cookiecutter.use_docker == 'y' -%}
+
         stage("Push release images") {
 
             when {
@@ -207,9 +215,11 @@ pipeline {
                 }
             }
         }
+
 {% endif %}
 
 {%- if cookiecutter.use_gcf == 'y' -%}
+
         stage("Deploy GCF") {
 
             when {
@@ -247,6 +257,7 @@ pipeline {
                         --source=gcf/")
             }
         }
+
 {% endif %}
 
 
