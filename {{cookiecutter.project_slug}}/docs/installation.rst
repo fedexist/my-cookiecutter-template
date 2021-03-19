@@ -12,7 +12,7 @@ To install {{ cookiecutter.project_name }}, run this command in your terminal:
 
 .. code-block:: console
 
-    $ pip install {{ cookiecutter.package_name }}
+    $ pip install {{ cookiecutter.project-slug }}
 
 This is the preferred method to install {{ cookiecutter.project_name }}, as it will always install the most recent stable release.
 

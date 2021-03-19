@@ -4,8 +4,12 @@ FROM python:3.8-slim
 FROM python:3.7-slim
 {% endif %}
 
+{%- if cookiecutter.release_pypi == 'y' -%}
+
 ARG PACKAGE_VERSION=dirty
 ENV PACKAGE_VERSION=$PACKAGE_VERSION
+
+{% endif %}
 
 LABEL mantainer="{{cookiecutter.full_name}} {{cookiecutter.email}}"\
       description="{{cookiecutter.project_short_description}}"
@@ -19,6 +23,7 @@ COPY setup.cfg /{{cookiecutter.project_slug}}/
 
 {%- else -%}
 
+
 RUN echo "\
 [install] \n\
 index-url = https://pypi.python.org/simple/ \n\
@@ -31,17 +36,19 @@ trusted-host = pypi.advancedanalytics.generali.com\
 {% endif %}
 
 
+
 WORKDIR /{{cookiecutter.project_slug}}
 
 RUN apt-get update -y && \
 
+
 {%- if cookiecutter.release_pypi != 'y' -%}
 
- python -m pip install .
+    python -m pip install .
 
 {%- else -%}
 
- python -m pip install {{cookiecutter.package_name}}==$PACKAGE_VERSION
+    python -m pip install {{cookiecutter.package_name}}==$PACKAGE_VERSION
 
 {% endif %}
 

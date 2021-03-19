@@ -307,7 +307,7 @@ pipeline {
             cleanWs deleteDirs: true, disableDeferredWipeout: true, patterns: [[pattern: '', type: 'INCLUDE']]
             script {
                 if(built_images){
-                    sh 'docker images -a | grep "${GCR_URL}/${APP_ID}" | grep "${DOCKER_IMAGE_TAG}" | awk \'{print $3}\' | xargs docker rmi -f'
+                    sh 'docker images -a | grep ${env.BASE_IMAGE} | awk \'{print \$3}\' | xargs docker rmi -f'
                 }
             }
 
