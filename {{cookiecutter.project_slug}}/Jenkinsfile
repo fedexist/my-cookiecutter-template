@@ -56,8 +56,7 @@ pipeline {
             }
         }
 
-
-{%- if cookiecutter.release_pypi == 'y' -%}
+{% if cookiecutter.release_pypi == 'y' %}
 
         stage('Staging on PyPi') {
 
@@ -82,7 +81,7 @@ pipeline {
                 script {
                     withCredentials([usernamePassword(credentialsId: 'pypi-credentials', usernameVariable: 'PYPI_USERNAME', passwordVariable: 'PYPI_PASSWORD')]) {
 
-                        version = sh(script: "python3 setup.py --version", returnStdout: true).trim()
+                        version = sh(script: ". venv/bin/activate && python3 setup.py --version", returnStdout: true).trim()
                         sh """
                         . venv/bin/activate
                         ${env.PYTHON_INTERPRETER} -m pip install .
@@ -101,12 +100,12 @@ pipeline {
         }
 
 
-{%- if cookiecutter.use_docker == 'y' -%}
+{% if cookiecutter.use_docker == 'y' %}
 
         stage("Build Docker images") {
             steps {
                 script {
-                    version = sh(script: "python3 setup.py --version", returnStdout: true).trim()
+                    version = sh(script: ". venv/bin/activate && python3 setup.py --version", returnStdout: true).trim()
                     docker_image_base = docker.build("${BASE_IMAGE_NAME}:${DOCKER_IMAGE_TAG}", "--build-arg PACKAGE_VERSION=$version -f Dockerfile .")
                     built_images = true
                 }
@@ -155,7 +154,7 @@ pipeline {
 {% endif %}
 
 
-{%- if cookiecutter.release_pypi == 'y' -%}
+{% if cookiecutter.release_pypi == 'y' %}
 
         stage('Release on PyPi') {
 
@@ -187,8 +186,7 @@ pipeline {
 
 {% endif %}
 
-
-{%- if cookiecutter.use_docker == 'y' -%}
+{% if cookiecutter.use_docker == 'y' %}
 
         stage("Push release images") {
 
@@ -207,9 +205,8 @@ pipeline {
 
             steps {
                 script {
-
                     withDockerRegistry(credentialsId: 'gcr:jenkins-service-account', url: "https://${env.GCR_URL}") {
-                        version = sh(script: "python3 setup.py --version", returnStdout: true).trim()
+                        version = sh(script: ". venv/bin/activate && python3 setup.py --version", returnStdout: true).trim()
                         docker_image_base.push(version)
                     }
                 }
@@ -218,7 +215,7 @@ pipeline {
 
 {% endif %}
 
-{%- if cookiecutter.use_gcf == 'y' -%}
+{% if cookiecutter.use_gcf == 'y' %}
 
         stage("Deploy GCF") {
 
@@ -260,7 +257,6 @@ pipeline {
 
 {% endif %}
 
-
         stage('Generate and publish doc release') {
 
            when {
@@ -276,12 +272,11 @@ pipeline {
                 }
            }
 
-
             steps {
                 script {
                     withCredentials([usernamePassword(credentialsId: 'pypi-credentials', usernameVariable: 'PYPI_USERNAME', passwordVariable: 'PYPI_PASSWORD')]) {
 
-                        version = sh(script: "python3 setup.py --version", returnStdout: true).trim()
+                        version = sh(script: ". venv/bin/activate && python3 setup.py --version", returnStdout: true).trim()
                         sh """
                         . venv/bin/activate
                         ${env.PYTHON_INTERPRETER} -m pip install .
@@ -314,9 +309,6 @@ pipeline {
         }
         success {
             slackSend (color: '#00FF00', message: "SUCCESSFUL: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})")
-            sh """
-                docker images -a | grep ${env.BASE_IMAGE} | awk \'{print \$3}\' | xargs docker rmi -f
-            """
         }
         failure {
             slackSend (color: '#FF0000', message: "FAILURE: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})")

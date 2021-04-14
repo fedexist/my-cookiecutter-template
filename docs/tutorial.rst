@@ -65,7 +65,7 @@ Step 2: Generate Your Package
 
 Now it's time to generate your Python package.
 
-Use cookiecutter, pointing it at the cookiecutter-pypackage repo:
+Use cookiecutter, pointing it at the aa-pypackage repo:
 
 .. code-block:: bash
 
@@ -74,11 +74,70 @@ Use cookiecutter, pointing it at the cookiecutter-pypackage repo:
 You'll be asked to enter a bunch of values to set the package up.
 If you don't know what to enter, stick with the defaults.
 
+If you don't want to be bothered by the prompt you can execute cookiecutter by using the ``--no-input`` flag:
+
+.. code-block:: bash
+
+    # Clone the repo
+    git clone https://gitlab.advancedanalytics.generali.com/aa-generali-italia/aa-pypackage.git
+    # or
+    git clone git@gitlab.advancedanalytics.generali.com:aa-generali-italia/aa-pypackage.git
+
+Then, update the cookiecutter.json file, according to your needs. For example:
+
+.. code-block:: json
+
+    {
+      "full_name": "Federico D'Ambrosio",
+      "email": "federico.dambrosio@generali.com",
+      "python_version": ["python3.8", "python3.7"],
+      "project_name": "My AA Project",
+      "project_slug": "{{ cookiecutter.project_name.lower().replace(' ', '_').replace('_', '-') }}",
+      "package_name": "{{ cookiecutter.project_name.lower().replace(' ', '_').replace('-', '_') }}",
+      "project_short_description": "aa-pypackage contains all the boilerplate you need to create a standard Python project ready to be deployed in production.",
+      "version": "0.0.1",
+      "confluence_parent_page": "{{ cookiecutter.project_slug }}",
+      "gcp_project_id": "poc-generali-aal",
+      "use_docker": "y",
+      "use_pytest": "y",
+      "init_git": "y",
+      "init_venv": "y",
+      "use_sql": "n",
+      "use_pycharm": "y",
+      "release_pypi": "y",
+      "use_jupyter": "n",
+      "command_line_interface": "Click",
+      "use_gcf": "n",
+      "use_freedaa": ["n", "y"],
+      "freeda_version": "0.0.1",
+      "gcf_name": "{{cookiecutter.package_name}}_cf",
+      "gcf_python_runtime": "{{ cookiecutter.python_version.replace('.', '') }}",
+      "gcf_trigger": [
+        "http",
+        "topic",
+        "bucket"
+      ],
+      "gcf_topic": "pubsub-topic",
+      "gcf_bucket": "gcs-bucket",
+      "gcf_memory": [
+        "128MB", "256MB", "512MB", "1024MB", "2048MB"
+      ],
+      "gcf_service_account": "gi-it-aa-{{cookiecutter.project_slug}}@{{cookiecutter.gcp_project_id}}.iam.gserviceaccount.com",
+      "project_bucket": "{{cookiecutter.project_slug}}",
+      "pipeline_path": "pipelines/latest/trained_pipeline.pkl",
+      "create_author_file": "y"
+    }
+
+and, finally, run
+
+.. code-block:: bash
+
+    cookiecutter aa-pypackage/ --no-input
 
 Step 3: Create a Gitlab Repo
 ----------------------------
 
-Go to your Gitlab account and create a new repo named ``mypackage``, where ``mypackage`` matches the ``[project_slug]`` from your answers to running cookiecutter. This is so that Travis CI and pyup.io can find it when we get to Step 5.
+Go to your Gitlab account and create a new repo named ``mypackage``, where ``mypackage`` matches the ``[project_slug]`` from your answers to running cookiecutter.
 
 ``If your virtualenv folder is within your project folder, be sure to add the virtualenv folder name to your .gitignore file.``
 

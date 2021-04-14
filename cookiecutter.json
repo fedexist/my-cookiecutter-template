@@ -13,7 +13,7 @@
   "use_pytest": ["y", "n"],
   "init_git": ["y", "n"],
   "init_venv": ["y", "n"],
-  "use_sql": ["y", "n"],
+  "use_sql": ["n", "y"],
   "use_pycharm": ["y", "n"],
   "release_pypi": ["y", "n"],
   "use_jupyter": ["y", "n"],
