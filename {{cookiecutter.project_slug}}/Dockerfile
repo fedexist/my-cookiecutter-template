@@ -5,15 +5,11 @@ FROM python:3.7-slim
 {% endif %}
 
 {% if cookiecutter.release_pypi == 'y' %}
-
 ARG PACKAGE_VERSION=dirty
 ENV PACKAGE_VERSION=$PACKAGE_VERSION
-
 {% endif %}
-
 LABEL mantainer="{{cookiecutter.full_name}} {{cookiecutter.email}}"\
       description="{{cookiecutter.project_short_description}}"
-
 {% if cookiecutter.release_pypi != 'y' %}
 COPY src /{{cookiecutter.project_slug}}/
 COPY setup.py /{{cookiecutter.project_slug}}/
