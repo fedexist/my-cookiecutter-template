@@ -112,7 +112,7 @@ Then, update the cookiecutter.json file, according to your needs. For example:
       "command_line_interface": "Click",
       "use_gcf": "n",
       "use_freedaa": ["n", "y"],
-      "freeda_version": "0.0.1",
+      "freedaa_version": "0.0.1",
       "gcf_name": "{{cookiecutter.package_name}}_cf",
       "gcf_python_runtime": "{{ cookiecutter.python_version.replace('.', '') }}",
       "gcf_trigger": [
