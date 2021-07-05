@@ -1,5 +1,5 @@
 """Main module."""
-{% if cookiecutter.freedaa_version >= '0.4.1'}
+{% if cookiecutter.freedaa_version >= '0.4.1' %}
 from typing import List
 
 from freedaa.application import FreedaaApplication
