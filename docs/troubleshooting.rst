@@ -28,3 +28,17 @@ Or:
     > c:\Python35\python c:\Python35\Tools\Scripts\pyvenv.py myenv
 
 * Some people have reported that they have to re-activate their virtualenv whenever they change directory, so you should remember the path to the virtualenv in case you need it.
+
+
+I don't understand how any of this works
+----------------------------------------
+
+Here I'll put some useful reference as to how all of this works:
+
+* Take a look at the documentation of `PyScaffold`_
+* Take a look at how Pythons's `Setuptools`_ handles ``setup.cfg``
+* Take a look at how you can use `bump2version`_ to manage versioned releases
+
+.. _`PyScaffold`: https://pyscaffold.org/en/stable/
+.. _`Setuptools`: https://setuptools.readthedocs.io/en/latest/userguide/declarative_config.html
+.. _`bump2version`: https://pypi.org/project/bump2version/

@@ -37,8 +37,7 @@
   "gcf_memory": [
     "128MB", "256MB", "512MB", "1024MB", "2048MB"
   ],
-  "gcf_service_account": "gi-it-aa-{{cookiecutter.project_slug}}@{{cookiecutter.gcp_project_id}}.iam.gserviceaccount.com",
+  "gcf_service_account": "sa-{{cookiecutter.project_slug}}@{{cookiecutter.gcp_project_id}}.iam.gserviceaccount.com",
   "project_bucket": "{{cookiecutter.project_slug}}",
-  "pipeline_path": "pipelines/latest/trained_pipeline.pkl",
   "create_author_file": "y"
 }

@@ -70,6 +70,9 @@ Use cookiecutter, pointing it at the aa-pypackage repo:
 .. code-block:: bash
 
     cookiecutter https://gitlab.advancedanalytics.generali.com/aa-generali-italia/aa-pypackage.git
+    # Alternatively, using ssh
+    cookiecutter git@gitlab.advancedanalytics.generali.com:aa-generali-italia/aa-pypackage.git
+
 
 You'll be asked to enter a bunch of values to set the package up.
 If you don't know what to enter, stick with the defaults.
@@ -187,8 +190,8 @@ Step 6: Set Up Jenkins (Ask your DE!)
 
 Follow the guide `provided in the Advanced Analytics wiki`_ to setup your Jenkins Pipeline.
 
-.. _`Jenkins`: https://jenkins.advancedanalytics.generali.com
-.. _`provided in the Advanced Analytics wiki`: https://aa-generali-italia.atlassian.net/wiki/spaces/DE/pages/1105592326/CI+CD+Gitlab+and+Jenkins?search_id=22711e42-46e3-4f8a-a2fd-aba090f21e3f#Jenkins-Setup
+.. _`Jenkins`: https://jenkins.foundation.advancedanalytics.generali.com
+.. _`provided in the Advanced Analytics wiki`: https://gbs.atlassian.net/wiki/spaces/DE/pages/29835034599/CI+CD+Gitlab+and+Jenkins#Jenkins-Setup
 
 
 Step 7: Set Up Your Confluence Documentation Page

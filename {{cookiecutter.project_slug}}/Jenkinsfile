@@ -143,28 +143,13 @@ pipeline {
                     version = sh(script: ". venv/bin/activate && python3 setup.py --version", returnStdout: true).trim()
                     docker_version = sh(script: ". venv/bin/activate && python3 setup.py --version | tr + .", returnStdout: true).trim()
 
-                    withCredentials([file(credentialsId: env.CREDENTIALS_ID, variable: "GC_KEY")]) {
-                        sh("gcloud auth activate-service-account --key-file=${GC_KEY}")
-                        sh("docker push ${BASE_IMAGE_NAME}:${env.DOCKER_IMAGE_TAG}")
-                        sh("docker push ${BASE_IMAGE_NAME}:${docker_version}")
-                        sh("docker push ${BASE_IMAGE_NAME}:latest")
-                    }
+                    sh("docker push ${BASE_IMAGE_NAME}:${env.DOCKER_IMAGE_TAG}")
+                    sh("docker push ${BASE_IMAGE_NAME}:${docker_version}")
+                    sh("docker push ${BASE_IMAGE_NAME}:latest")
                 }
             }
         }
 
-
-        stage("Push latest images") {
-
-            steps {
-                script {
-
-                    withDockerRegistry(credentialsId: 'gcr:jenkins-service-account', url: "https://${env.GCR_URL}") {
-                        docker_image_base.push("latest")
-                    }
-                }
-            }
-        }
 
 {% endif %}
 
@@ -220,10 +205,8 @@ pipeline {
 
             steps {
                 script {
-                    withDockerRegistry(credentialsId: 'gcr:jenkins-service-account', url: "https://${env.GCR_URL}") {
-                        version = sh(script: ". venv/bin/activate && python3 setup.py --version | tr + .", returnStdout: true).trim()
-                        sh("docker push ${BASE_IMAGE_NAME}:${version}")
-                    }
+                    version = sh(script: ". venv/bin/activate && python3 setup.py --version | tr + .", returnStdout: true).trim()
+                    sh("docker push ${BASE_IMAGE_NAME}:${version}")
                 }
             }
         }
@@ -247,11 +230,19 @@ pipeline {
             }
 
             steps{
-                // Here you should copy all files that are needed by the Google Cloud Function
-                sh("cp -r src/* gcf/")
-                sh("cp requirements.txt gcf/requirements.txt")
-                sh("gsutil cp gs://{{cookiecutter.project_bucket}}/{{cookiecutter.pipeline_path}} gcf/static_files/")
                 // A Google Cloud Function named as the project will be deployed
+                version = sh(script: ". venv/bin/activate && python setup.py --version", returnStdout: true).trim()
+                sh("""
+                    export VERSION=${version}
+                    envsubst < gcf/requirements.txt.tmpl > gcf/requirements.txt
+                    cat gcf/requirements.txt
+
+                    envsubst < gcf/envvars.${ENV}.yaml > gcf/envvars.yaml
+                    cat gcf/envvars.yaml
+
+                    cp dist/*.whl gcf/wheels/
+                """)
+
                 sh("gcloud functions deploy {{ cookiecutter.gcf_name }} \
                         --runtime {{cookiecutter.gcf_python_runtime}} \
                         --region europe-west1 \
@@ -266,7 +257,8 @@ pipeline {
                         --memory={{cookiecutter.gcf_memory}} \
                         --timeout=540s \
                         --entry-point={{ cookiecutter.gcf_name }} \
-                        --source=gcf/")
+                        --source=gcf/ \
+                        --env-vars-file=gcf/envvars.yaml")
             }
         }
 

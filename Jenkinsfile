@@ -1,12 +1,6 @@
 pipeline {
     agent any
 
-    environment {
-        PROJECT_ID = 'poc-generali-aal'
-        LOCATION = 'europe-west1-b'
-        CREDENTIALS_ID = 'jenkins-service-account'
-    }
-
     stages {
 
         stage('Clone sources') {

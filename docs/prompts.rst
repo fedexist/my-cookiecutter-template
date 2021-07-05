@@ -92,10 +92,10 @@ use_pycharm
     Whether you're going to use PyCharm as IDE.
 
 release_pypi
-    Whether you want your package to be released on pypi. This will cause
+    Whether you want your package to be released on pypi. This will update the Dockerfile and Jenkinsfile so that it will release a python package out of the project, that will be used within the Docker image as a simple 'pip install'
 
 use_jupyter
-    Whether your project will have jupyter notebooks.
+    Whether your project will have jupyter notebooks. This option will add or remove a folder named 'ipynb', where you should be supposed to put your notebook files.
 
 command_line_interface
     Whether to create a console script using Click. Console script entry point will match the project_slug. Options: ['Click', "No command-line interface"]
@@ -104,4 +104,4 @@ use_gcf
     Whether to deploy a Google Cloud Function for the project and serving of the model
 
 use_freedaa
-    Whether you're going to use FrEEdAA as dependency for your project.
+    Whether you're going to use FrEEdAA as dependency for your project. This will add freedaa as dependency in the setup.cfg file

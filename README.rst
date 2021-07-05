@@ -44,6 +44,8 @@ Cookiecutter 1.4.0 or higher)::
 Generate a Python package project::
 
     cookiecutter https://gitlab.advancedanalytics.generali.com/aa-generali-italia/aa-pypackage
+    # Or
+    cookiecutter git@gitlab.advancedanalytics.generali.com:aa-generali-italia/aa-pypackage.git
 
 Then:
 
