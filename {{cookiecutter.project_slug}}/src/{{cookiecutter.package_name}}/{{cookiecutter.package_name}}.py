@@ -1,5 +1,5 @@
 """Main module."""
-{% if cookiecutter.freedaa_version >= '0.4.1' %}
+{% if cookiecutter.use_freedaa == 'y' and cookiecutter.freedaa_version >= '0.4.1' %}
 from typing import List
 
 from freedaa.application import FreedaaApplication
@@ -9,7 +9,7 @@ from freedaa.pipeline import Pipeline
 def do_nothing():
     pass
 
-{% if cookiecutter.freedaa_version >= '0.4.1' %}
+{% if cookiecutter.use_freedaa == 'y' and cookiecutter.freedaa_version >= '0.4.1' %}
 class MyModelApplication(FreedaaApplication):
     @staticmethod
     def training_dataset_builder():
