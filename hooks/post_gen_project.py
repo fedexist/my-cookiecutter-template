@@ -66,6 +66,6 @@ if __name__ == '__main__':
         os.system('mv git-hooks/* .git/hooks')
         remove_folder('git-hooks')
         os.system('git add .')
-        os.system('git commit -am "Initial commit"')
+        os.system('git commit -am "Initial commit" --no-verify')
     else:
         remove_folder('git-hooks')
