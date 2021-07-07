@@ -36,4 +36,4 @@ RUN apt-get update -y && \
     python -m pip install {{cookiecutter.package_name}}==$PACKAGE_VERSION
 {% endif %}
 
-ENTRYPOINT ["python", "-m", "{{cookiecutter.package_name}}"]
+ENTRYPOINT ["python", "-m", "{{cookiecutter.package_name}}.cli"]
