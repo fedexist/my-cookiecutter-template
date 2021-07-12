@@ -5,6 +5,24 @@ import shutil
 
 PROJECT_DIRECTORY = os.path.realpath(os.path.curdir)
 
+__is_windows = os.name == 'nt'
+__is_posix = os.name == 'posix'
+
+PYTHON_COMMAND = '{{cookiecutter.python_version}}'
+VENV_PYTHON_COMMAND = PYTHON_COMMAND
+PIP_COMMAND = 'pip'
+
+if __is_windows:
+    PYTHON_COMMAND += '.exe'
+    PIP_COMMAND += '.exe'
+
+if __is_posix:
+    ACTIVATE_VENV = 'source venv/bin/activate'
+elif __is_windows:
+    ACTIVATE_VENV = './venv/bin/activate'
+else:
+    raise OSError(f"Unsupported {os.name} OS, cannot activate any virtual environment")
+
 
 def remove_file(filepath):
     os.remove(os.path.join(PROJECT_DIRECTORY, filepath))
@@ -46,17 +64,18 @@ if __name__ == '__main__':
 
     if '{{ cookiecutter.init_venv }}' == 'y':
         print("Now initializing Python virtual environment...")
-        os.system('{{cookiecutter.python_version}} -m venv venv')
+        os.system(f'{PYTHON_COMMAND} -m venv venv')
 
         print("Now installing development dependencies...")
-        os.system('source venv/bin/activate && '
-                  'pip install -r requirements_dev.txt')
+        os.system(f'{ACTIVATE_VENV} && '
+                  f'{PIP_COMMAND} install -r requirements_dev.txt')
 
         if '{{ cookiecutter.use_jupyter }}' == 'y':
-            print("Now creating an IPyKernel based on the current Virtual Environment...")
-            os.system('source venv/bin/activate && '
-                      'pip install --upgrade pip setuptools ipykernel && '
-                      'python -m ipykernel install --name={{ cookiecutter.project_slug }}-venv')
+            print("Now creating an IPyKernel based on the current Virtual "
+                  "Environment named {{ cookiecutter.project_slug }}-venv...")
+            os.system(f'{ACTIVATE_VENV} && '
+                      f'{PIP_COMMAND} install --upgrade pip setuptools ipykernel && '
+                      f'{VENV_PYTHON_COMMAND} -m ipykernel install --name={{ cookiecutter.project_slug }}-venv')
         else:
             remove_folder('ipynb')
 
