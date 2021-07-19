@@ -91,9 +91,6 @@ use_sql
 use_pycharm
     Whether you're going to use PyCharm as IDE.
 
-release_pypi
-    Whether you want your package to be released on pypi. This will update the Dockerfile and Jenkinsfile so that it will release a python package out of the project, that will be used within the Docker image as a simple 'pip install'
-
 use_jupyter
     Whether your project will have jupyter notebooks. This option will add or remove a folder named 'ipynb', where you should be supposed to put your notebook files.
 

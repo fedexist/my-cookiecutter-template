@@ -64,7 +64,6 @@ pipeline {
             }
         }
 
-{% if cookiecutter.release_pypi == 'y' %}
 
         stage('Staging on PyPi') {
 
@@ -79,9 +78,6 @@ pipeline {
                 }
             }
         }
-
-{% endif %}
-
 
         stage('Generate and publish doc staging') {
 
@@ -153,9 +149,6 @@ pipeline {
 
 {% endif %}
 
-
-{% if cookiecutter.release_pypi == 'y' %}
-
         stage('Release on PyPi') {
 
             when {
@@ -183,8 +176,6 @@ pipeline {
             }
 
         }
-
-{% endif %}
 
 {% if cookiecutter.use_docker == 'y' %}
 

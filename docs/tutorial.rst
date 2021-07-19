@@ -107,7 +107,6 @@ Then, update the cookiecutter.json file, according to your needs. For example:
       "init_venv": "y",
       "use_sql": "n",
       "use_pycharm": "y",
-      "release_pypi": "y",
       "use_jupyter": "n",
       "command_line_interface": "Click",
       "use_gcf": "n",

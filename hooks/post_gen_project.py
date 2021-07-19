@@ -41,14 +41,6 @@ if __name__ == '__main__':
     if '{{ cookiecutter.use_docker }}' != 'y':
         remove_file("Dockerfile")
 
-    if '{{ cookiecutter.release_pypi }}' == 'y':
-        print("Now deleting bash, config, ipynb and gcf, since this will a package to be released on pypi")
-        remove_folder("bash")
-        remove_folder("config")
-        remove_folder("ipynb")
-        remove_folder("gcf")
-        remove_folder('src/{{ cookiecutter.package_name }}/sql')
-
     if 'no' in '{{ cookiecutter.command_line_interface|lower }}':
         cli_file = os.path.join('src', '{{ cookiecutter.package_name }}', 'cli.py')
         remove_file(cli_file)

@@ -15,7 +15,6 @@
   "init_venv": ["y", "n"],
   "use_sql": ["n", "y"],
   "use_pycharm": ["y", "n"],
-  "release_pypi": ["y", "n"],
   "use_jupyter": ["y", "n"],
   "command_line_interface": [
     "Click",
