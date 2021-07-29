@@ -90,8 +90,8 @@ pipeline {
                         . venv/bin/activate
                         ${env.PYTHON_INTERPRETER} -m pip install .
                         ${env.PYTHON_INTERPRETER} -m pip install devpi-client
+                        make docs
                         cd docs
-                        make html
                         cd _build/html && zip -r {{cookiecutter.package_name}}-${version}.doc.zip . && cd -
                         devpi use ${PYPI_REPO_STAGING}
                         devpi login ${PYPI_USERNAME} --password=${PYPI_PASSWORD}
@@ -279,9 +279,8 @@ pipeline {
                         . venv/bin/activate
                         ${env.PYTHON_INTERPRETER} -m pip install .
                         ${env.PYTHON_INTERPRETER} -m pip install devpi-client
+                        make docs-release
                         cd docs
-                        make confluence
-                        make html
                         cd _build/html && zip -r {{cookiecutter.package_name}}-${version}.doc.zip . && cd -
                         devpi use ${PYPI_REPO_STABLE}
                         devpi login ${PYPI_USERNAME} --password=${PYPI_PASSWORD}

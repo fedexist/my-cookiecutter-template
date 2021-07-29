@@ -70,10 +70,18 @@ coverage: ## check code coverage quickly with the default Python
 	coverage html
 	$(BROWSER) htmlcov/index.html
 
-docs: ## generate Sphinx HTML documentation
+apidoc:
+	sphinx-apidoc -f --extensions sphinx.ext.autosummary --ext-autodoc -o docs/_generated src/freedaa
+
+docs: apidoc ## generate Sphinx HTML documentation
 	$(MAKE) -C docs clean
 	$(MAKE) -C docs html
+
+docs-local: docs ## generate Sphinx HTML documentation and open it in the webbrowser
 	$(BROWSER) docs/_build/html/index.html
+
+docs-release: docs ## generate Sphinx HTML documentation and publish it on Confluence
+	$(MAKE) -C docs confluence
 
 servedocs: docs ## compile the docs watching for changes
 	watchmedo shell-command -p '*.rst' -c '$(MAKE) -C docs html' -R -D .
