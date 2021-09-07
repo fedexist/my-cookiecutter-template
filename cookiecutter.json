@@ -23,7 +23,7 @@
   ],
   "use_gcf": ["n", "y"],
   "use_freedaa": ["n", "y"],
-  "freedaa_version": "0.0.1",
+  "freedaa_version": "0.4.5",
   "gcf_name": "{{cookiecutter.package_name}}_cf",
   "gcf_python_runtime": "{{ cookiecutter.python_version.replace('.', '') }}",
   "gcf_trigger": [

@@ -71,7 +71,7 @@ coverage: ## check code coverage quickly with the default Python
 	$(BROWSER) htmlcov/index.html
 
 apidoc:
-	sphinx-apidoc -f --extensions sphinx.ext.autosummary --ext-autodoc -o docs/_generated src/freedaa
+	sphinx-apidoc -f --extensions sphinx.ext.autosummary --ext-autodoc -o docs/_generated src/{{ cookiecutter.package_name }}
 
 docs: apidoc ## generate Sphinx HTML documentation
 	$(MAKE) -C docs clean

@@ -21,7 +21,14 @@ trusted-host = pypi.advancedanalytics.generali.com\
 
 WORKDIR /{{cookiecutter.project_slug}}
 
-RUN apt-get update -y && \
-    python -m pip install {{cookiecutter.package_name}}==$PACKAGE_VERSION
+RUN apt-get update -y && apt-get install gcc -y
+RUN pip install --upgrade pip setuptools wheel
+
+RUN python -m pip install {{cookiecutter.package_name}}==$PACKAGE_VERSION
+
+RUN groupadd -r aa && useradd --no-log-init -r -s /bin/false -g aa aauser
+RUN chown -R aauser:aa /{{cookiecutter.project_slug}} && \
+    chmod -R ug+rwx /{{cookiecutter.project_slug}}
+USER aauser
 
 ENTRYPOINT ["python", "-m", "{{cookiecutter.package_name}}.cli"]
