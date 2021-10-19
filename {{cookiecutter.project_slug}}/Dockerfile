@@ -1,7 +1,7 @@
 {% if cookiecutter.python_version == 'python3.8' %}
 FROM python:3.8-slim
-{% elif cookiecutter.python_version == 'python3.7' %}
-FROM python:3.7-slim
+{% elif cookiecutter.python_version == 'python3.9' %}
+FROM python:3.9-slim
 {% endif %}
 
 ARG PACKAGE_VERSION=dirty

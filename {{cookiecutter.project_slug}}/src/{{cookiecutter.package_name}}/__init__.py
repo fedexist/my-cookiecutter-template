@@ -5,7 +5,7 @@ from pkg_resources import DistributionNotFound, get_distribution
 
 
 __author__ = """{{ cookiecutter.full_name }}"""
-__email__ = '{{ cookiecutter.email }}'
+__email__ = "{{ cookiecutter.email }}"
 
 
 try:
@@ -13,6 +13,6 @@ try:
     dist_name = __name__
     __version__ = get_distribution(dist_name).version
 except DistributionNotFound:
-    __version__ = '{{ cookiecutter.version }}'
+    __version__ = "{{ cookiecutter.version }}"
 finally:
     del get_distribution, DistributionNotFound

@@ -93,20 +93,17 @@ Then, update the cookiecutter.json file, according to your needs. For example:
     {
       "full_name": "Federico D'Ambrosio",
       "email": "federico.dambrosio@generali.com",
-      "python_version": ["python3.8", "python3.7"],
+      "python_version": "python3.9",
       "project_name": "My AA Project",
       "project_slug": "{{ cookiecutter.project_name.lower().replace(' ', '_').replace('_', '-') }}",
       "package_name": "{{ cookiecutter.project_name.lower().replace(' ', '_').replace('-', '_') }}",
       "project_short_description": "aa-pypackage contains all the boilerplate you need to create a standard Python project ready to be deployed in production.",
       "version": "0.0.1",
       "confluence_parent_page": "{{ cookiecutter.project_slug }}",
-      "gcp_project_id": "poc-generali-aal",
       "use_docker": "y",
-      "use_pytest": "y",
       "init_git": "y",
       "init_venv": "y",
       "use_sql": "n",
-      "use_pycharm": "y",
       "use_jupyter": "n",
       "command_line_interface": "Click",
       "use_gcf": "n",
@@ -124,7 +121,7 @@ Then, update the cookiecutter.json file, according to your needs. For example:
       "gcf_memory": [
         "128MB", "256MB", "512MB", "1024MB", "2048MB"
       ],
-      "gcf_service_account": "gi-it-aa-{{cookiecutter.project_slug}}@{{cookiecutter.gcp_project_id}}.iam.gserviceaccount.com",
+      "gcf_service_account": "gi-it-aa-{{cookiecutter.project_slug}}@project_id.iam.gserviceaccount.com",
       "project_bucket": "{{cookiecutter.project_slug}}",
       "pipeline_path": "pipelines/latest/trained_pipeline.pkl",
       "create_author_file": "y"

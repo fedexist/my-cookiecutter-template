@@ -51,9 +51,6 @@ if __name__ == '__main__':
     if '{{ cookiecutter.use_sql }}' != 'y':
         remove_folder('src/{{ cookiecutter.package_name }}/sql')
 
-    if '{{ cookiecutter.use_pycharm }}' != 'y':
-        remove_folder('.idea')
-
     if '{{ cookiecutter.init_venv }}' == 'y':
         print("Now initializing Python virtual environment...")
         os.system(f'{PYTHON_COMMAND} -m venv venv')

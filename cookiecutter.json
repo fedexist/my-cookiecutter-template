@@ -1,20 +1,17 @@
 {
   "full_name": "Federico D'Ambrosio",
   "email": "federico.dambrosio@generali.com",
-  "python_version": ["python3.8", "python3.7"],
+  "python_version": ["python3.9", ,"python3.8"],
   "project_name": "My AA Project",
   "project_slug": "{{ cookiecutter.project_name.lower().replace(' ', '_').replace('_', '-') }}",
   "package_name": "{{ cookiecutter.project_name.lower().replace(' ', '_').replace('-', '_') }}",
   "project_short_description": "aa-pypackage contains all the boilerplate you need to create a standard Python project ready to be deployed in production.",
   "version": "0.0.1",
   "confluence_parent_page": "{{ cookiecutter.project_name }}",
-  "gcp_project_id": "poc-generali-aal",
   "use_docker": ["y", "n"],
-  "use_pytest": ["y", "n"],
   "init_git": ["y", "n"],
   "init_venv": ["y", "n"],
   "use_sql": ["n", "y"],
-  "use_pycharm": ["y", "n"],
   "use_jupyter": ["y", "n"],
   "command_line_interface": [
     "Click",
@@ -36,7 +33,7 @@
   "gcf_memory": [
     "128MB", "256MB", "512MB", "1024MB", "2048MB"
   ],
-  "gcf_service_account": "sa-{{cookiecutter.project_slug}}@{{cookiecutter.gcp_project_id}}.iam.gserviceaccount.com",
+  "gcf_service_account": "sa-{{cookiecutter.project_slug}}@project_id.iam.gserviceaccount.com",
   "project_bucket": "{{cookiecutter.project_slug}}",
   "create_author_file": "y"
 }

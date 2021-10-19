@@ -32,9 +32,6 @@ project_short_description
 version
     The starting version number of the package.
 
-gcp_project_id
-    GCP project to be used by the Jenkinsfile and FrEEdAA
-
 confluence_parent_page
     Name of the parent Confluent page under which the documentation will be published
 
@@ -76,9 +73,6 @@ The following package configuration options set up different features for your p
 use_docker
     Whether you need a Docker image for you project
 
-use_pytest
-    Whether to use pytest as test suite.
-
 init_git
     Whether you want to initialize a git repository with the start-up of the project. It will also configures some git-hooks to be used for pre-commit and pre-push.
 
@@ -87,9 +81,6 @@ init_venv
 
 use_sql
     Whether you're going to use sql queries within your project.
-
-use_pycharm
-    Whether you're going to use PyCharm as IDE.
 
 use_jupyter
     Whether your project will have jupyter notebooks. This option will add or remove a folder named 'ipynb', where you should be supposed to put your notebook files.
