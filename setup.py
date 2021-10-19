@@ -4,7 +4,7 @@ from distutils.core import setup
 setup(
     name='aa-pypackage',
     packages=[],
-    version='0.1.0',
+    version='1.0.0',
     description='Cookiecutter template for a standard Python package, with optional FrEEdAA enabled.',
     author='Federico D\'Ambrosio',
     author_email='federico.dambrosio@generali.com',
