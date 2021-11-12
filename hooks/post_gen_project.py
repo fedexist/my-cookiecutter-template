@@ -75,5 +75,7 @@ if __name__ == '__main__':
         remove_folder('git-hooks')
         os.system('git add .')
         os.system('git commit -am "Initial commit" --no-verify')
+        print("Installing pre-commit hooks using .pre-commit-config.yaml")
+        os.system(f'{ACTIVATE_VENV} && pre-commit install')
     else:
         remove_folder('git-hooks')

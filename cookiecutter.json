@@ -1,7 +1,7 @@
 {
   "full_name": "Federico D'Ambrosio",
   "email": "federico.dambrosio@generali.com",
-  "python_version": ["python3.9", ,"python3.8"],
+  "python_version": ["python3.9", "python3.8"],
   "project_name": "My AA Project",
   "project_slug": "{{ cookiecutter.project_name.lower().replace(' ', '_').replace('_', '-') }}",
   "package_name": "{{ cookiecutter.project_name.lower().replace(' ', '_').replace('-', '_') }}",
