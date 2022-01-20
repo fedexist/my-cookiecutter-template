@@ -1,17 +1,17 @@
-def built_images
-
 pipeline {
     agent any
 
     environment {
         CREDENTIALS_ID = "${PROJECT_ID}-json"
         GCR_URL = "eu.gcr.io/${PROJECT_ID}"
-        DOCKER_IMAGE_LATEST = "latest"
         COMMIT_HASH = sh(script: 'git rev-parse --short HEAD', returnStdout: true).trim()
         BASE_IMAGE = "{{cookiecutter.project_slug}}"
         BASE_IMAGE_NAME = "${env.GCR_URL}/${env.BASE_IMAGE}"
-        DOCKER_IMAGE_TAG = sh(script: "echo ${GIT_BRANCH} | sed -r 's/[_/.?]+/-/g' | awk '{print tolower(\$0)}' | xargs -I@ echo @-${env.COMMIT_HASH}-${env.BUILD_NUMBER}", returnStdout: true).trim()
-        PYTHON_INTERPRETER = '{{ cookiecutter.python_version }}'
+        COMMIT_TAG = sh(script: "echo ${GIT_BRANCH} | sed -r 's/[_/.?]+/-/g' | awk '{print tolower(\$0)}' | xargs -I@ echo @-${env.COMMIT_HASH}-${env.BUILD_NUMBER}", returnStdout: true).trim()
+        PYTHON_INTERPRETER = 'python{{ cookiecutter.python_version }}'
+        PYTHON_VERSION = '{{ cookiecutter.python_version }}'
+        PACKAGE_VERSION = sh(script: "python3 setup.py --version", returnStdout: true).trim()
+        DOCKER_VERSION = sh(script: "echo ${PACKAGE_VERSION} | tr + .", returnStdout: true).trim()
         PYPI_REPO_STAGING = "http://pypi.advancedanalytics.generali.com/ge-it-aa/staging/"
         PYPI_REPO_STABLE = "http://pypi.advancedanalytics.generali.com/ge-it-aa/stable/"
         CONFLUENCE_TOKEN = credentials('confluence-token')
@@ -38,23 +38,46 @@ pipeline {
             }
         }
 
-        stage('Run tests') {
-            environment {
-                ENV='TEST'
-            }
+       stage("Env Config") {
             steps {
-                sh """
-                ${env.PYTHON_INTERPRETER} -m venv venv
-                . venv/bin/activate
-                ${env.PYTHON_INTERPRETER} -m pip install -r requirements_dev.txt
-                ${env.PYTHON_INTERPRETER} -m tox
-                """
+                script {
+                    // load configs
+                    load "cicd/${BRANCH_TYPE}.groovy"
+                    echo "Deploy Settings: Env = ${env.ENV}, TargetProjectId = ${env.TARGET_PROJECT}, BranchType = ${env.BRANCH_TYPE}, DockerTag = ${env.COMMIT_TAG}"
+                    // set build name
+                    currentBuild.displayName = "Build: [#${BUILD_NUMBER}] - Env: ${env.ENV}"
+                    currentBuild.description = "Env: ${env.ENV}\nBranchType = ${env.BRANCH_TYPE}\nTarget: ${env.TARGET_PROJECT}\nDockerTag: ${env.COMMIT_TAG}"
+                }
             }
         }
 
+        stage('Run tests') {
+
+            agent {
+                docker {
+                    image "eu.gcr.io/${env.ARTIFACT_PROJECT}/aa-python:${PYTHON_VERSION}-slim"
+                    reuseNode true
+                    label '{{ cookiecutter.legal_entity.lower() }}'
+                }
+            }
+            steps {
+                sh '''
+                pip install -r requirements_dev.txt
+                tox
+                '''
+            }
+        }
 
         stage('SQ analysis') {
-             environment {
+
+           agent {
+                docker {
+                    image "sonarsource/sonar-scanner-cli"
+                    reuseNode true
+                    label '{{ cookiecutter.legal_entity.lower() }}'
+                }
+            }
+            environment {
                 scannerHome = tool 'sonar_scanner'
             }
             steps {
@@ -66,12 +89,17 @@ pipeline {
 
 
         stage('Staging on PyPi') {
-
+            agent {
+                docker {
+                    image "eu.gcr.io/${env.ARTIFACT_PROJECT}/aa-python:${PYTHON_VERSION}-slim"
+                    reuseNode true
+                    label '{{ cookiecutter.legal_entity.lower() }}'
+                }
+            }
             steps {
                 script {
                     withCredentials([usernamePassword(credentialsId: 'pypi-credentials', usernameVariable: 'PYPI_USERNAME', passwordVariable: 'PYPI_PASSWORD')]) {
                         sh """
-                        . venv/bin/activate
                         make staging
                         """
                     }
@@ -80,16 +108,19 @@ pipeline {
         }
 
         stage('Generate and publish doc staging') {
-
+            agent {
+                docker {
+                    image "eu.gcr.io/${env.ARTIFACT_PROJECT}/aa-python:${PYTHON_VERSION}-slim"
+                    reuseNode true
+                    label '{{ cookiecutter.legal_entity.lower() }}'
+                }
+            }
             steps {
                 script {
                     withCredentials([usernamePassword(credentialsId: 'pypi-credentials', usernameVariable: 'PYPI_USERNAME', passwordVariable: 'PYPI_PASSWORD')]) {
-
-                        version = sh(script: ". venv/bin/activate && python3 setup.py --version", returnStdout: true).trim()
                         sh """
-                        . venv/bin/activate
-                        ${env.PYTHON_INTERPRETER} -m pip install .
-                        ${env.PYTHON_INTERPRETER} -m pip install devpi-client
+                        pip install .
+                        pip install devpi-client
                         make docs
                         cd docs
                         cd _build/html && zip -r {{cookiecutter.package_name}}-${version}.doc.zip . && cd -
@@ -105,51 +136,58 @@ pipeline {
 
 {% if cookiecutter.use_docker == 'y' %}
 
-        stage("Build Docker images") {
+        stage('Build, Push & Deploy Infra'){
+            environment {
+                TARGET_PROJECT_OWNER_CREDENTIALS_ID = getCredentialsId(env.TARGET_PROJECT_ID)
+            }
+            agent {
+                docker {
+                    image "eu.gcr.io/${env.ARTIFACT_PROJECT}/aa-terraform:1.0"
+                    reuseNode true
+                    args '-u root:root --entrypoint= -v /var/run/docker.sock:/var/run/docker.sock'
+                    label '{{ cookiecutter.legal_entity.lower() }}'
+                }
+            }
             steps {
+                withCredentials([
+                    file(credentialsId: env.TERRAFORM_SA_CRED_NAME, variable: "GOOGLE_APPLICATION_CREDENTIALS"),
+                    file(credentialsId: env.TARGET_PROJECT_OWNER_CREDENTIALS_ID, variable: "DOCKER_APPLICATION_CREDENTIALS")
+                ]) {
+                    script {
 
-                script {
-
-                    version = sh(script: ". venv/bin/activate && python3 setup.py --version", returnStdout: true).trim()
-                    docker_version = sh(script: ". venv/bin/activate && python3 setup.py --version | tr + .", returnStdout: true).trim()
-
-                    docker_image_base = docker.build("${BASE_IMAGE_NAME}:${DOCKER_IMAGE_TAG}",
-                        "-t ${BASE_IMAGE_NAME}:latest -t ${BASE_IMAGE_NAME}:${docker_version} --build-arg PACKAGE_VERSION=$version -f Dockerfile .")
-                    built_images = true
+                        sh """
+                            terraform -chdir=\$(pwd)/tf init \
+                                -no-color \
+                                -compact-warnings \
+                                -backend-config=bucket=${env.STATE_BUCKET}
+                        """
+                        sh """
+                            terraform -chdir=\$(pwd)/tf apply \
+                                -auto-approve \
+                                -no-color \
+                                -compact-warnings \
+                                -var-file=env/${env.ENV}.tfvars \
+                                -var=gcr_target_project=${env.TARGET_PROJECT_ID} \
+                                -var=gcp_sa_key=${DOCKER_APPLICATION_CREDENTIALS} \
+                                -var='image_tags=["latest","${DOCKER_VERSION}","${COMMIT_TAG}"]' \
+                                -var=build_args=PACKAGE_VERSION=${PACKAGE_VERSION}
+                        """
+                    }
                 }
             }
         }
-
-        stage("Docker image Scanning") {
-            steps {
-                script {
-                    //We can accept LOW/MEDIUM/HIGH Vulnerabilities
-                    sh "trivy --exit-code 0 --severity LOW,MEDIUM,HIGH \"${env.BASE_IMAGE_NAME}:${DOCKER_IMAGE_TAG}\""
-
-                    // We cannot accept CRITICAL Vulnerabilities
-                    // Yes, we can if there's no fix available
-                    // sh "trivy --exit-code 1 --severity CRITICAL \"${env.BASE_IMAGE_NAME}:${COMMIT_HASH}\""
-                }
-            }
-        }
-
-        stage("Push commit images") {
-            steps {
-                script {
-                    version = sh(script: ". venv/bin/activate && python3 setup.py --version", returnStdout: true).trim()
-                    docker_version = sh(script: ". venv/bin/activate && python3 setup.py --version | tr + .", returnStdout: true).trim()
-
-                    sh("docker push ${BASE_IMAGE_NAME}:${env.DOCKER_IMAGE_TAG}")
-                    sh("docker push ${BASE_IMAGE_NAME}:${docker_version}")
-                    sh("docker push ${BASE_IMAGE_NAME}:latest")
-                }
-            }
-        }
-
+    }
 
 {% endif %}
 
         stage('Release on PyPi') {
+           agent {
+                docker {
+                    image "eu.gcr.io/${env.ARTIFACT_PROJECT}/aa-python:${PYTHON_VERSION}-slim"
+                    reuseNode true
+                    label '{{ cookiecutter.legal_entity.lower() }}'
+                }
+            }
 
             when {
                 allOf {
@@ -168,7 +206,6 @@ pipeline {
                 script {
                     withCredentials([usernamePassword(credentialsId: 'pypi-credentials', usernameVariable: 'PYPI_USERNAME', passwordVariable: 'PYPI_PASSWORD')]) {
                         sh """
-                        . venv/bin/activate
                         make release
                         """
                     }
@@ -177,85 +214,14 @@ pipeline {
 
         }
 
-{% if cookiecutter.use_docker == 'y' %}
-
-        stage("Push release images") {
-
-            when {
-                allOf {
-                    expression {
-                        return env.GIT_BRANCH == "origin/master"
-                    }
-
-                    expression {
-                        return sh(returnStdout: true, script: "git tag --contains").trim()
-                    }
-
-                }
-            }
-
-            steps {
-                script {
-                    version = sh(script: ". venv/bin/activate && python3 setup.py --version | tr + .", returnStdout: true).trim()
-                    sh("docker push ${BASE_IMAGE_NAME}:${version}")
-                }
-            }
-        }
-
-{% endif %}
-
-{% if cookiecutter.use_gcf == 'y' %}
-
-        stage("Deploy GCF") {
-
-            when {
-                allOf {
-                    expression {
-                        return env.GIT_BRANCH == "origin/master"
-                    }
-                    expression {
-                        return sh(returnStdout: true, script: "git tag --contains").trim()
-                    }
-
-                }
-            }
-
-            steps{
-                // A Google Cloud Function named as the project will be deployed
-                version = sh(script: ". venv/bin/activate && python setup.py --version", returnStdout: true).trim()
-                sh("""
-                    export VERSION=${version}
-                    envsubst < gcf/requirements.txt.tmpl > gcf/requirements.txt
-                    cat gcf/requirements.txt
-
-                    envsubst < gcf/envvars.${ENV}.yaml > gcf/envvars.yaml
-                    cat gcf/envvars.yaml
-
-                    cp dist/*.whl gcf/wheels/
-                """)
-
-                sh("gcloud functions deploy {{ cookiecutter.gcf_name }} \
-                        --runtime {{cookiecutter.gcf_python_runtime}} \
-                        --region europe-west1 \
-                        {%- if cookiecutter.gcf_trigger == "http" -%}
-                        --trigger-http \
-                        {%- elif cookiecutter.gcf_trigger == "bucket" -%}
-                        --trigger-bucket={{cookiecutter.gcf_bucket}} \
-                        {%- elif cookiecutter.gcf_trigger == "topic" -%}
-                        --trigger-topic={{cookiecutter.gcf_topic}} \
-                        {% endif %}
-                        --service-account={{cookiecutter.gcf_service_account}}
-                        --memory={{cookiecutter.gcf_memory}} \
-                        --timeout=540s \
-                        --entry-point={{ cookiecutter.gcf_name }} \
-                        --source=gcf/ \
-                        --env-vars-file=gcf/envvars.yaml")
-            }
-        }
-
-{% endif %}
-
         stage('Generate and publish doc release') {
+           agent {
+                docker {
+                    image "eu.gcr.io/${env.ARTIFACT_PROJECT}/aa-python:${PYTHON_VERSION}-slim"
+                    reuseNode true
+                    label '{{ cookiecutter.legal_entity.lower() }}'
+                }
+            }
 
            when {
                 allOf {
@@ -274,11 +240,9 @@ pipeline {
                 script {
                     withCredentials([usernamePassword(credentialsId: 'pypi-credentials', usernameVariable: 'PYPI_USERNAME', passwordVariable: 'PYPI_PASSWORD')]) {
 
-                        version = sh(script: ". venv/bin/activate && python3 setup.py --version", returnStdout: true).trim()
                         sh """
-                        . venv/bin/activate
-                        ${env.PYTHON_INTERPRETER} -m pip install .
-                        ${env.PYTHON_INTERPRETER} -m pip install devpi-client
+                        pip install .
+                        pip install devpi-client
                         make docs-release
                         cd docs
                         cd _build/html && zip -r {{cookiecutter.package_name}}-${version}.doc.zip . && cd -
@@ -296,16 +260,11 @@ pipeline {
 
     post {
         always {
+            sh "sudo chmod -R 777 ."
             cleanWs deleteDirs: true, disableDeferredWipeout: true, patterns: [[pattern: '', type: 'INCLUDE']]
             script {
-                if(built_images){
-                    sh """
-                        docker images -a | grep '${env.BASE_IMAGE}' | awk \'{print \$3}\' | xargs docker rmi -f
-                       """
-
-                }
+                  sh("docker images -a | grep '${env.BASE_IMAGE}' | awk \'{print \$3}\' | xargs --no-run-if-empty docker rmi -f")
             }
-
         }
         success {
             slackSend (color: '#00FF00', message: "SUCCESSFUL: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})")
