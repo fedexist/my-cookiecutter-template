@@ -12,7 +12,8 @@ LABEL mantainer="{{cookiecutter.full_name}} {{cookiecutter.email}}"\
 
 WORKDIR /{{cookiecutter.project_slug}}
 
-RUN python -m pip install {{cookiecutter.package_name}}==$PACKAGE_VERSION
+RUN --mount=type=secret,id=creds GOOGLE_APPLICATION_CREDENTIALS=/run/secrets/creds \
+    python -m pip install {{cookiecutter.package_name}}==$PACKAGE_VERSION
 
 RUN groupadd -r aa && useradd --no-log-init -r -s /bin/false -g aa aauser
 RUN chown -R aauser:aa /{{cookiecutter.project_slug}} && \

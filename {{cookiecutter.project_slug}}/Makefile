@@ -48,7 +48,7 @@ clean-test: ## remove test and coverage artifacts
 	rm -fr .pytest_cache
 
 lint: ## check style with flake8
-	flake8 src/ tests
+	flake8 app/src/ app/tests
 
 test: ## run tests quickly with the default Python
 	pytest
@@ -79,10 +79,10 @@ servedocs: docs ## compile the docs watching for changes
 	watchmedo shell-command -p '*.rst' -c '$(MAKE) -C docs html' -R -D .
 
 staging: dist
-	twine upload -u ${PYPI_USERNAME} -p ${PYPI_PASSWORD} --repository-url ${PYPI_REPO_STAGING} dist/*
+	twine upload --repository-url ${PYPI_REPO_STAGING} dist/*
 
 release: dist ## package and upload a release
-	twine upload -u ${PYPI_USERNAME} -p ${PYPI_PASSWORD} --repository-url ${PYPI_REPO_STABLE} dist/*
+	twine upload --repository-url ${PYPI_REPO_STABLE} dist/*
 
 dist: clean ## builds source and wheel package
 	python setup.py sdist

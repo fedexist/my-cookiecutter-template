@@ -98,7 +98,7 @@ pipeline {
             }
             steps {
                 script {
-                    withCredentials([usernamePassword(credentialsId: 'pypi-credentials', usernameVariable: 'PYPI_USERNAME', passwordVariable: 'PYPI_PASSWORD')]) {
+                    withCredentials([file(credentialsId: env.CREDENTIALS_ID, variable: "GOOGLE_APPLICATION_CREDENTIALS")]) {
                         sh """
                         make staging
                         """
@@ -107,6 +107,7 @@ pipeline {
             }
         }
 
+/*
         stage('Generate and publish doc staging') {
             agent {
                 docker {
@@ -133,7 +134,7 @@ pipeline {
             }
 
         }
-
+*/
 {% if cookiecutter.use_docker == 'y' %}
 
         stage('Build, Push & Deploy Infra'){
@@ -204,7 +205,7 @@ pipeline {
 
             steps {
                 script {
-                    withCredentials([usernamePassword(credentialsId: 'pypi-credentials', usernameVariable: 'PYPI_USERNAME', passwordVariable: 'PYPI_PASSWORD')]) {
+                    withCredentials([file(credentialsId: env.CREDENTIALS_ID, variable: "GOOGLE_APPLICATION_CREDENTIALS")]) {
                         sh """
                         make release
                         """

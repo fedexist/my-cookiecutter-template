@@ -1,7 +1,7 @@
 {
   "full_name": "Federico D'Ambrosio",
   "email": "federico.dambrosio@generali.com",
-  "python_version": ["3.9", "3.8"],
+  "python_version": ["3.10", "3.9", "3.8"],
   "project_name": "My AA Project",
   "project_slug": "{{ cookiecutter.project_name.lower().replace(' ', '_').replace('_', '-') }}",
   "package_name": "{{ cookiecutter.project_name.lower().replace(' ', '_').replace('-', '_') }}",
@@ -9,31 +9,10 @@
   "version": "0.0.1",
   "confluence_parent_page": "{{ cookiecutter.project_name }}",
   "use_docker": ["y", "n"],
-  "init_git": ["y", "n"],
-  "init_venv": ["y", "n"],
-  "use_sql": ["n", "y"],
-  "use_jupyter": ["y", "n"],
   "command_line_interface": [
     "Click",
     "Argparse",
     "No command-line interface"
   ],
-  "use_gcf": ["n", "y"],
-  "use_freedaa": ["n", "y"],
-  "freedaa_version": "0.4.5",
-  "gcf_name": "{{cookiecutter.package_name}}_cf",
-  "gcf_python_runtime": "{{ cookiecutter.python_version.replace('.', '') }}",
-  "gcf_trigger": [
-    "http",
-    "topic",
-    "bucket"
-  ],
-  "gcf_topic": "pubsub-topic",
-  "gcf_bucket": "gcs-bucket",
-  "gcf_memory": [
-    "128MB", "256MB", "512MB", "1024MB", "2048MB"
-  ],
-  "gcf_service_account": "sa-{{cookiecutter.project_slug}}@project_id.iam.gserviceaccount.com",
-  "project_bucket": "{{cookiecutter.project_slug}}",
   "create_author_file": "y"
 }
