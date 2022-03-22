@@ -1,18 +1,20 @@
 # -*- coding: utf-8 -*-
 # """Top-level package for {{ cookiecutter.project_name }}."""
+import sys
 
-from pkg_resources import DistributionNotFound, get_distribution
-
+if sys.version_info[:2] >= (3, 8):
+    from importlib.metadata import PackageNotFoundError, version  # pragma: no cover
+else:
+    from importlib_metadata import PackageNotFoundError, version  # pragma: no cover
 
 __author__ = """{{ cookiecutter.full_name }}"""
 __email__ = "{{ cookiecutter.email }}"
 
-
 try:
     # Change here if project is renamed and does not equal the package name
     dist_name = __name__
-    __version__ = get_distribution(dist_name).version
-except DistributionNotFound:
+    __version__ = version(dist_name)
+except PackageNotFoundError:  # pragma: no cover
     __version__ = "{{ cookiecutter.version }}"
 finally:
-    del get_distribution, DistributionNotFound
+    del version, PackageNotFoundError

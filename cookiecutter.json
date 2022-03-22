@@ -8,11 +8,11 @@
   "project_short_description": "aa-pypackage contains all the boilerplate you need to create a standard Python project ready to be deployed in production.",
   "version": "0.0.1",
   "confluence_parent_page": "{{ cookiecutter.project_name }}",
-  "use_docker": ["y", "n"],
   "command_line_interface": [
     "Click",
     "Argparse",
     "No command-line interface"
   ],
-  "create_author_file": "y"
+  "create_author_file": "y",
+  "legal_entity": ["GI", "GTL", "ALL", "JEN", "WEL"]
 }

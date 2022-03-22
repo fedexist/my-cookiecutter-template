@@ -5,13 +5,10 @@ pipeline {
         CREDENTIALS_ID = "${PROJECT_ID}-json"
         GCR_URL = "eu.gcr.io/${PROJECT_ID}"
         COMMIT_HASH = sh(script: 'git rev-parse --short HEAD', returnStdout: true).trim()
-        BASE_IMAGE = "{{cookiecutter.project_slug}}"
-        BASE_IMAGE_NAME = "${env.GCR_URL}/${env.BASE_IMAGE}"
         COMMIT_TAG = sh(script: "echo ${GIT_BRANCH} | sed -r 's/[_/.?]+/-/g' | awk '{print tolower(\$0)}' | xargs -I@ echo @-${env.COMMIT_HASH}-${env.BUILD_NUMBER}", returnStdout: true).trim()
         PYTHON_INTERPRETER = 'python{{ cookiecutter.python_version }}'
         PYTHON_VERSION = '{{ cookiecutter.python_version }}'
         PACKAGE_VERSION = sh(script: "python3 setup.py --version", returnStdout: true).trim()
-        DOCKER_VERSION = sh(script: "echo ${PACKAGE_VERSION} | tr + .", returnStdout: true).trim()
         PYPI_REPO_STAGING = "http://pypi.advancedanalytics.generali.com/ge-it-aa/staging/"
         PYPI_REPO_STABLE = "http://pypi.advancedanalytics.generali.com/ge-it-aa/stable/"
         CONFLUENCE_TOKEN = credentials('confluence-token')
@@ -135,52 +132,6 @@ pipeline {
 
         }
 */
-{% if cookiecutter.use_docker == 'y' %}
-
-        stage('Build, Push & Deploy Infra'){
-            environment {
-                TARGET_PROJECT_OWNER_CREDENTIALS_ID = getCredentialsId(env.TARGET_PROJECT_ID)
-            }
-            agent {
-                docker {
-                    image "eu.gcr.io/${env.ARTIFACT_PROJECT}/aa-terraform:1.0"
-                    reuseNode true
-                    args '-u root:root --entrypoint= -v /var/run/docker.sock:/var/run/docker.sock'
-                    label '{{ cookiecutter.legal_entity.lower() }}'
-                }
-            }
-            steps {
-                withCredentials([
-                    file(credentialsId: env.TERRAFORM_SA_CRED_NAME, variable: "GOOGLE_APPLICATION_CREDENTIALS"),
-                    file(credentialsId: env.TARGET_PROJECT_OWNER_CREDENTIALS_ID, variable: "DOCKER_APPLICATION_CREDENTIALS")
-                ]) {
-                    script {
-
-                        sh """
-                            terraform -chdir=\$(pwd)/tf init \
-                                -no-color \
-                                -compact-warnings \
-                                -backend-config=bucket=${env.STATE_BUCKET}
-                        """
-                        sh """
-                            terraform -chdir=\$(pwd)/tf apply \
-                                -auto-approve \
-                                -no-color \
-                                -compact-warnings \
-                                -var-file=env/${env.ENV}.tfvars \
-                                -var=gcr_target_project=${env.TARGET_PROJECT_ID} \
-                                -var=gcp_sa_key=${DOCKER_APPLICATION_CREDENTIALS} \
-                                -var='image_tags=["latest","${DOCKER_VERSION}","${COMMIT_TAG}"]' \
-                                -var=build_args=PACKAGE_VERSION=${PACKAGE_VERSION}
-                        """
-                    }
-                }
-            }
-        }
-    }
-
-{% endif %}
-
         stage('Release on PyPi') {
            agent {
                 docker {
@@ -263,9 +214,6 @@ pipeline {
         always {
             sh "sudo chmod -R 777 ."
             cleanWs deleteDirs: true, disableDeferredWipeout: true, patterns: [[pattern: '', type: 'INCLUDE']]
-            script {
-                  sh("docker images -a | grep '${env.BASE_IMAGE}' | awk \'{print \$3}\' | xargs --no-run-if-empty docker rmi -f")
-            }
         }
         success {
             slackSend (color: '#00FF00', message: "SUCCESSFUL: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})")
