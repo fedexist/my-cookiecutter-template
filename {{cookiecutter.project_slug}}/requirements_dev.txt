@@ -1,19 +1,16 @@
-pip==21.3
-bump2version==1.0.1
-wheel==0.37.0
+bump2version
+wheel
 watchdog==2.1.6
 flake8==4.0.1
-tox==3.24.4
-coverage==6.0.2ah
+tox<4
+coverage
 Sphinx==4.2.0
-sphinxcontrib-confluencebuilder==1.6.0
-twine==3.4.2
-mypy==0.910
-radon==5.1.0
+sphinxcontrib-confluencebuilder
+twine
+mypy
+radon
 xenon==0.7.1
 pylint==2.11.1
-{% if cookiecutter.command_line_interface|lower == 'click' -%}
-Click==8.0.1{% endif %}
 pytest==6.2.5
 pytest-runner==5.3.1
 pytest-cov==3.0.0

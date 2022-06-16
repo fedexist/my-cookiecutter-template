@@ -47,7 +47,8 @@ if __name__ == '__main__':
 
     print("Now installing development dependencies...")
     os.system(f"{ACTIVATE_VENV} && "
-              f"{PIP_COMMAND} install -r requirements_dev.txt")
+              f"{PIP_COMMAND} install -U pip && "
+              f"{PIP_COMMAND} install -U -r requirements_dev.txt")
 
     print("Now committing to git and creating git-hooks...")
     os.system("git init")
