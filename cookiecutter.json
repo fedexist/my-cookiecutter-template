@@ -14,5 +14,5 @@
     "No command-line interface"
   ],
   "create_author_file": "y",
-  "legal_entity": ["GI", "GTL", "ALL", "JEN", "WEL"]
+  "legal_entity": ["gi", "gtl", "all", "jen", "wel", "plt"]
 }

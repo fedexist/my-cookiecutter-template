@@ -2,38 +2,18 @@ pipeline {
     agent any
 
     environment {
-        CREDENTIALS_ID = "${PROJECT_ID}-json"
-        GCR_URL = "eu.gcr.io/${PROJECT_ID}"
+        APP_ID = "{{ cookiecutter.project_slug }}"
+        LE = "{{ cookiecutter.legal_entity }}"
         COMMIT_HASH = sh(script: 'git rev-parse --short HEAD', returnStdout: true).trim()
         COMMIT_TAG = sh(script: "echo ${GIT_BRANCH} | sed -r 's/[_/.?]+/-/g' | awk '{print tolower(\$0)}' | xargs -I@ echo @-${env.COMMIT_HASH}-${env.BUILD_NUMBER}", returnStdout: true).trim()
-        PYTHON_INTERPRETER = 'python{{ cookiecutter.python_version }}'
-        PYTHON_VERSION = '{{ cookiecutter.python_version }}'
-        PACKAGE_VERSION = sh(script: "python3 setup.py --version", returnStdout: true).trim()
-        PYPI_REPO_STAGING = "http://pypi.advancedanalytics.generali.com/ge-it-aa/staging/"
-        PYPI_REPO_STABLE = "http://pypi.advancedanalytics.generali.com/ge-it-aa/stable/"
-        CONFLUENCE_TOKEN = credentials('confluence-token')
+        PYTHON_VERSION = '3.9'
+        PACKAGE_VERSION = ""
+        DOCKER_VERSION = ""
         HOME="${env.WORKSPACE}"
+        BRANCH_TYPE = "${GIT_BRANCH.split("/")[0] == 'feature' ? GIT_BRANCH.split("/")[0] : GIT_BRANCH.split("/")[1]}"
     }
 
     stages {
-
-        stage('Clone sources') {
-            steps {
-                slackSend (color: '#FFFF00', message: "STARTED: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})")
-                sh """
-                echo ${env.BRANCH_NAME}
-                echo ${env.TAG_NAME}
-                """
-                git branch: env.gitlabSourceBranch, poll: false, credentialsId: '2bd6f462-e60e-4de9-a67c-da11e3829363', url: env.gitlabSourceRepoHttpUrl
-
-                script {
-                    withCredentials([file(credentialsId: env.CREDENTIALS_ID, variable: "GC_KEY")]) {
-                        sh("gcloud auth activate-service-account --key-file=${GC_KEY}")
-                        sh("gcloud auth configure-docker")
-                    }
-                }
-            }
-        }
 
        stage("Env Config") {
             steps {
@@ -48,19 +28,49 @@ pipeline {
             }
         }
 
+        stage("Checkout platform-terraform-modules") {
+            environment {
+                AA_MODULES_CRED = credentials('sw00251-aa-sources-plt-tech_user')
+            }
+            steps {
+                sh "git clone -c http.sslverify=false https://$AA_MODULES_CRED_USR:$AA_MODULES_CRED_PSW@gitlab.generali.it/sw00251-aa-sources-plt/sources/shared-components/platform-terraform-modules.git tf/platform-terraform-modules/"
+            }
+        }
+
+        stage('Clone sources') {
+            environment {
+                ARTIFACT_PROJECT_OWNER_CREDENTIALS_ID = getCredentialsId(env.ARTIFACT_PROJECT)
+            }
+
+            steps {
+                slackSend (color: '#FFFF00', message: "STARTED: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})", tokenCredentialId: 'slack-connection-token')
+                sh """
+                echo ${env.BRANCH_NAME}
+                echo ${env.TAG_NAME}
+                """
+
+                checkout scm
+                script {
+                    withCredentials([file(credentialsId: env.ARTIFACT_PROJECT_OWNER_CREDENTIALS_ID, variable: "GC_KEY")]) {
+                        sh("gcloud auth activate-service-account --key-file=${GC_KEY}")
+                        sh("gcloud auth configure-docker ${DOCKER_REGISTRY}")
+                    }
+                }
+            }
+        }
+
         stage('Run tests') {
 
             agent {
                 docker {
-                    image "eu.gcr.io/${env.ARTIFACT_PROJECT}/aa-python:${PYTHON_VERSION}-slim"
+                    image "${DOCKER_URL}/tox:3.24.5"
                     reuseNode true
                     label '{{ cookiecutter.legal_entity.lower() }}'
                 }
             }
             steps {
                 sh '''
-                pip install -r requirements_dev.txt
-                tox
+                tox -vv
                 '''
             }
         }
@@ -74,153 +84,106 @@ pipeline {
                     label '{{ cookiecutter.legal_entity.lower() }}'
                 }
             }
+            steps {
+                withSonarQubeEnv(credentialsId: 'sw00251-aa-sources-plt-sonar-login-token', installationName: 'DATA-ANALYTICS SQ') {
+                    sh 'sonar-scanner'
+                }
+            }
+        }
+
+
+        stage('Publish package on PyPi') {
             environment {
-                scannerHome = tool 'sonar_scanner'
+                ARTIFACT_PROJECT_OWNER_CREDENTIALS_ID = getCredentialsId(env.ARTIFACT_PROJECT)
             }
-            steps {
-                withSonarQubeEnv(credentialsId: 'sonarqube_token', installationName: 'sonarqube_aa') {
-                    sh '${scannerHome}/bin/sonar-scanner'
-                }
-            }
-        }
 
-
-        stage('Staging on PyPi') {
             agent {
                 docker {
-                    image "eu.gcr.io/${env.ARTIFACT_PROJECT}/aa-python:${PYTHON_VERSION}-slim"
+                    image "${DOCKER_URL}/tox:3.24.5"
                     reuseNode true
-                    label '{{ cookiecutter.legal_entity.lower() }}'
+                    label 'gi'
                 }
             }
+
             steps {
                 script {
-                    withCredentials([file(credentialsId: env.CREDENTIALS_ID, variable: "GOOGLE_APPLICATION_CREDENTIALS")]) {
+                    PACKAGE_VERSION = sh(script: "python3.9 setup.py --version", returnStdout: true).trim()
+                    DOCKER_VERSION = sh(script: "echo ${PACKAGE_VERSION} | tr + .", returnStdout: true).trim()
+                    // Should be tox -e publish but it doesn't work because there is no justice in the world
+                    withCredentials([file(credentialsId: env.ARTIFACT_PROJECT_OWNER_CREDENTIALS_ID, variable: "GOOGLE_APPLICATION_CREDENTIALS")]) {
                         sh """
-                        make staging
+                        tox -e clean,build
+                        tox -e publish
                         """
                     }
                 }
             }
         }
 
-/*
-        stage('Generate and publish doc staging') {
+        stage('Build & Deploy docker images'){
+            environment {
+                TARGET_PROJECT_OWNER_CREDENTIALS_ID = getCredentialsId(env.TARGET_PROJECT_ID)
+            }
             agent {
                 docker {
-                    image "eu.gcr.io/${env.ARTIFACT_PROJECT}/aa-python:${PYTHON_VERSION}-slim"
+                    image "${DOCKER_URL}/aa-terraform:1.0"
                     reuseNode true
-                    label '{{ cookiecutter.legal_entity.lower() }}'
+                    args '-u root:root --entrypoint= -v /var/run/docker.sock:/var/run/docker.sock'
                 }
             }
             steps {
-                script {
-                    withCredentials([usernamePassword(credentialsId: 'pypi-credentials', usernameVariable: 'PYPI_USERNAME', passwordVariable: 'PYPI_PASSWORD')]) {
-                        sh """
-                        pip install .
-                        pip install devpi-client
-                        make docs
-                        cd docs
-                        cd _build/html && zip -r {{cookiecutter.package_name}}-${version}.doc.zip . && cd -
-                        devpi use ${PYPI_REPO_STAGING}
-                        devpi login ${PYPI_USERNAME} --password=${PYPI_PASSWORD}
-                        devpi upload _build/html/{{cookiecutter.package_name}}-${version}.doc.zip
-                        """
-                    }
-                }
-            }
-
-        }
-*/
-        stage('Release on PyPi') {
-           agent {
-                docker {
-                    image "eu.gcr.io/${env.ARTIFACT_PROJECT}/aa-python:${PYTHON_VERSION}-slim"
-                    reuseNode true
-                    label '{{ cookiecutter.legal_entity.lower() }}'
-                }
-            }
-
-            when {
-                allOf {
-                    expression {
-                        return env.GIT_BRANCH == "origin/master"
-                    }
-
-                    expression {
-                        return sh(returnStdout: true, script: "git tag --contains").trim()
-                    }
-
-                }
-            }
-
-            steps {
-                script {
-                    withCredentials([file(credentialsId: env.CREDENTIALS_ID, variable: "GOOGLE_APPLICATION_CREDENTIALS")]) {
-                        sh """
-                        make release
-                        """
-                    }
-                }
-            }
-
-        }
-
-        stage('Generate and publish doc release') {
-           agent {
-                docker {
-                    image "eu.gcr.io/${env.ARTIFACT_PROJECT}/aa-python:${PYTHON_VERSION}-slim"
-                    reuseNode true
-                    label '{{ cookiecutter.legal_entity.lower() }}'
-                }
-            }
-
-           when {
-                allOf {
-                    expression {
-                        return env.GIT_BRANCH == "origin/master"
-                    }
-
-                    expression {
-                        return sh(returnStdout: true, script: "git tag --contains").trim()
-                    }
-
-                }
-           }
-
-            steps {
-                script {
-                    withCredentials([usernamePassword(credentialsId: 'pypi-credentials', usernameVariable: 'PYPI_USERNAME', passwordVariable: 'PYPI_PASSWORD')]) {
+                withCredentials([
+                    file(credentialsId: env.TERRAFORM_SA_CRED_NAME, variable: "GOOGLE_APPLICATION_CREDENTIALS"),
+                    file(credentialsId: env.TARGET_PROJECT_OWNER_CREDENTIALS_ID, variable: "DOCKER_APPLICATION_CREDENTIALS")
+                ]) {
+                    script {
+                        echo "${PACKAGE_VERSION}"
+                        echo "${DOCKER_VERSION}"
 
                         sh """
-                        pip install .
-                        pip install devpi-client
-                        make docs-release
-                        cd docs
-                        cd _build/html && zip -r {{cookiecutter.package_name}}-${version}.doc.zip . && cd -
-                        devpi use ${PYPI_REPO_STABLE}
-                        devpi login ${PYPI_USERNAME} --password=${PYPI_PASSWORD}
-                        devpi upload _build/html/{{cookiecutter.package_name}}-${version}.doc.zip
+                            terraform -chdir=\$(pwd)/tf init \
+                                -no-color \
+                                -compact-warnings \
+                                -backend-config=bucket=${env.STATE_BUCKET}
                         """
+                        sh """
+                            terraform -chdir=\$(pwd)/tf apply \
+                                -auto-approve \
+                                -no-color \
+                                -compact-warnings \
+                                -var-file=env/${env.ENV}.tfvars \
+                                -var=target_project=${env.TARGET_PROJECT_ID} \
+                                -var=gcp_sa_key=${DOCKER_APPLICATION_CREDENTIALS} \
+                                -var=service_version=${DOCKER_VERSION} \
+                                -var=build_args=PACKAGE_VERSION=${PACKAGE_VERSION},BASE_IMAGE=${BASE_IMAGE} \
+                                -var=secrets="id=creds,src=${DOCKER_APPLICATION_CREDENTIALS}"
+                        """
+
+                        sh("chown -R 999:999 .")
                     }
                 }
             }
-
         }
 
     }
 
     post {
         always {
-            sh "sudo chmod -R 777 ."
-            cleanWs deleteDirs: true, disableDeferredWipeout: true, patterns: [[pattern: '', type: 'INCLUDE']]
+            cleanWs()
+            script {
+                  sh("docker images -a | grep '${env.APP_ID}' | awk \'{print \$3}\' | xargs --no-run-if-empty docker rmi -f")
+            }
         }
         success {
-            slackSend (color: '#00FF00', message: "SUCCESSFUL: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})")
+            slackSend (color: '#00FF00', message: "SUCCESSFUL: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})", tokenCredentialId: 'slack-connection-token')
         }
         failure {
-            slackSend (color: '#FF0000', message: "FAILURE: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})")
+            slackSend (color: '#FF0000', message: "FAILURE: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})", tokenCredentialId: 'slack-connection-token')
 
         }
     }
+}
+
+def getCredentialsId(projectId) {
+    return projectId + "-json"
 }
