@@ -1,8 +1,5 @@
-{% if cookiecutter.python_version == 'python3.8' %}
-FROM eu.gcr.io/it-nonprod-mlt-advana-000013/aa-python:3.8-slim
-{% elif cookiecutter.python_version == 'python3.9' %}
-FROM eu.gcr.io/it-nonprod-mlt-advana-000013/aa-python:3.9-slim
-{% endif %}
+ARG BASE_IMAGE
+FROM $BASE_IMAGE
 
 ARG PACKAGE_VERSION=dirty
 ENV PACKAGE_VERSION=$PACKAGE_VERSION
