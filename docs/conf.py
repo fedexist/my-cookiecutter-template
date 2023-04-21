@@ -35,7 +35,6 @@ extensions = [
     'sphinx.ext.todo',
     'sphinx.ext.coverage',
     'sphinx.ext.viewcode',
-    'sphinxcontrib.confluencebuilder'
 ]
 
 # Add any paths that contain templates here, relative to this directory.

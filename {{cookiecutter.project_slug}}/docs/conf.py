@@ -37,7 +37,6 @@ extensions = [
     'sphinx.ext.todo',
     'sphinx.ext.coverage',
     'sphinx.ext.viewcode',
-    'sphinxcontrib.confluencebuilder',
     'sphinx.ext.autosummary'
     ]
 
@@ -167,11 +166,3 @@ texinfo_documents = [
      '{{ cookiecutter.project_short_description }}',
      'Miscellaneous'),
 ]
-
-# Confluence publish
-confluence_publish = True
-confluence_space_name = 'DE'
-confluence_parent_page = '{{cookiecutter.confluence_parent_page}}'
-confluence_server_url = 'https://gbs.atlassian.net/wiki/'
-confluence_server_user = 'federico.dambrosio@generali.com'
-confluence_server_pass = os.getenv('CONFLUENCE_TOKEN')
