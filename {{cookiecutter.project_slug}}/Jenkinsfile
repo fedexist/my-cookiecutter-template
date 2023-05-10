@@ -3,7 +3,7 @@ pipeline {
 
     environment {
         APP_ID = "{{ cookiecutter.project_slug }}"
-        LE = "{{ cookiecutter.legal_entity }}"
+        LE = "{{ cookiecutter.legal_entity.lower() }}"
         COMMIT_HASH = sh(script: 'git rev-parse --short HEAD', returnStdout: true).trim()
         COMMIT_TAG = sh(script: "echo ${GIT_BRANCH} | sed -r 's/[_/.?]+/-/g' | awk '{print tolower(\$0)}' | xargs -I@ echo @-${env.COMMIT_HASH}-${env.BUILD_NUMBER}", returnStdout: true).trim()
         PYTHON_VERSION = '3.9'
@@ -66,7 +66,7 @@ pipeline {
                 docker {
                     image "${DOCKER_URL}/tox:3.24.5"
                     reuseNode true
-                    label '{{ cookiecutter.legal_entity }}'
+                    label '{{ cookiecutter.legal_entity.lower() }}'
                 }
             }
 
@@ -107,7 +107,7 @@ pipeline {
                 docker {
                     image "${DOCKER_URL}/tox:3.24.5"
                     reuseNode true
-                    label 'gi'
+                    label '{{ cookiecutter.legal_entity.lower() }}'
                 }
             }
 

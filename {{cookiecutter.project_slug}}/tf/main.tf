@@ -3,11 +3,11 @@ terraform {
   required_providers {
     google = {
       source = "hashicorp/google"
-      version = "~> 3.88.0"
+      version = ">= 4.0.0, < 5.0.0"
     }
   }
   backend "gcs" {
-    prefix = "ml-ops/{{ cookiecutter.project_slug }}"
+    prefix = "{{ cookiecutter.tenant_name }}/{{ cookiecutter.project_slug }}"
   }
 }
 
