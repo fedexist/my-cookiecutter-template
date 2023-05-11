@@ -24,19 +24,6 @@ pipeline {
                 '''
             }
         }
-
-        stage('Generate and publish doc') {
-            steps {
-                withCredentials([string(credentialsId: 'confluence-token', variable: 'CONFLUENCE_TOKEN')]) {
-                    sh '''
-                    . venv/bin/activate
-                    cd docs
-                    make confluence
-                    '''
-                }
-            }
-        }
-
     }
 
     post {
