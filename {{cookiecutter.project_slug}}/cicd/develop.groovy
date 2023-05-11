@@ -12,4 +12,4 @@ env.DOCKER_URL = "${DOCKER_REGISTRY}/${ARTIFACT_PROJECT}/docker-images"
 env.BASE_IMAGE = "${DOCKER_URL}/aa-python:{{ cookiecutter.python_version }}-slim"
 
 // User-Defined Variables
-env.TARGET_PROJECT_ID = null
+env.TARGET_PROJECT_ID = "it-nonprod-gen-advana-000007"
